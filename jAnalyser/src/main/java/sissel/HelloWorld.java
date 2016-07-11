@@ -1,0 +1,17 @@
+package sissel;
+
+/**
+ * demo to be tested on
+ * Created by Sissel on 2016/7/10.
+ */
+
+public class HelloWorld
+{
+    public static void main(String[] args)
+    {
+        String hello = "hello, world!";
+        String goodbye = "goodbye";
+        System.out.println(hello);
+        System.out.println(goodbye);
+    }
+}
