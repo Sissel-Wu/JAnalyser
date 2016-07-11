@@ -1,0 +1,3 @@
+在用Connector来launch的时候，从Process可以看出找不到类，结果可能是主机的环境变量有问题
+
+解决是通过设置defaultArgument里面的options为“-cp <路径>”

@@ -1,0 +1,5 @@
+﻿JPDA介绍
+http://www.ibm.com/developerworks/cn/java/j-lo-jpda1/
+
+DEMO的源码参考
+http://www.ibm.com/developerworks/cn/java/j-lo-jpda4/index.html
