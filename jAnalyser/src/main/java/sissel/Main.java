@@ -10,9 +10,7 @@ import com.sun.jdi.request.EventRequest;
 import com.sun.jdi.request.EventRequestManager;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -36,15 +34,15 @@ public class Main
         LaunchingConnector defaultConnector = machineManager.defaultConnector();
 
         Map<String, Connector.Argument> defaultArguments = defaultConnector.defaultArguments();
-        Connector.Argument mainArg = defaultArguments.get("main");
-        Connector.Argument suspendArg = defaultArguments.get("suspend");
-        Connector.Argument options = defaultArguments.get("options");
 
-        suspendArg.setValue("true");
-        mainArg.setValue("sissel.HelloWorld");
-        options.setValue("-cp G:\\Repository\\JAnalyser\\jAnalyser\\target\\classes");
+        for (String s : defaultArguments.keySet())
+        {
+            System.out.println(s + ": " + defaultArguments.get(s).description());
+        }
 
-        System.out.println(options.description());
+        defaultArguments.get("main").setValue("sissel.HelloWorld");
+        defaultArguments.get("suspend").setValue("true");
+        defaultArguments.get("options").setValue("-cp G:\\Repository\\JAnalyser\\jAnalyser\\target\\classes");
 
         vm = defaultConnector.launch(defaultArguments);
 
@@ -57,9 +55,7 @@ public class Main
 
         eventLoop();
 
-        InputStreamReader reader = new InputStreamReader(process.getInputStream());
-        BufferedReader br = new BufferedReader(reader);
-
+        BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(), "gbk"));
         br.lines().forEach(System.out::println);
 
         br = new BufferedReader(new InputStreamReader(process.getErrorStream(), "gbk"));
@@ -83,6 +79,39 @@ public class Main
         }
     }
 
+    private static void displayClasses(VirtualMachine vm)
+    {
+        List<ReferenceType> list = vm.allClasses();
+        for (ReferenceType referenceType : list)
+        {
+            if (! (referenceType.name().contains("Father") || referenceType.name().contains("Hello")))
+            {
+                continue;
+            }
+
+            System.out.println(referenceType.name());
+            System.out.println("=== field ===");
+            for (Field field : referenceType.allFields())
+            {
+                try
+                {
+                    Type type = field.type();
+                    System.out.print(field.name() + ": ");
+                    System.out.println(type.name());
+                } catch (ClassNotLoadedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("=== method ===");
+            for (Method method : referenceType.allMethods())
+            {
+                System.out.print(method.name() + ": ");
+                System.out.println(method.signature());
+            }
+        }
+    }
+
     private static void execute(Event event) throws AbsentInformationException, IncompatibleThreadStateException
     {
         if (event instanceof VMStartEvent)
@@ -100,7 +129,7 @@ public class Main
 
                 // Get location
                 ReferenceType referenceType = classPrepareEvent.referenceType();
-                List locations = referenceType.locationsOfLine(14);
+                List locations = referenceType.locationsOfLine(20);
                 Location location = (Location) locations.get(0);
 
                 // Create BreakpointEvent
@@ -114,7 +143,9 @@ public class Main
         }
         else if (event instanceof BreakpointEvent)
         {
-            System.out.println("Reach line 14 of sissel.HelloWorld");
+            displayClasses(vm);
+
+            System.out.println("reach break point");
             BreakpointEvent breakpointEvent = (BreakpointEvent) event;
             ThreadReference threadReference = breakpointEvent.thread();
             StackFrame stackFrame = threadReference.frame(0);
@@ -122,7 +153,7 @@ public class Main
                     .visibleVariableByName("hello");
             Value value = stackFrame.getValue(localVariable);
             String str = ((StringReference) value).value();
-            System.out.println("The local variable str at line 14 is " + str
+            System.out.println("The local variable str at breakpoint is " + str
                     + " of " + value.type().name());
             eventSet.resume();
         }
