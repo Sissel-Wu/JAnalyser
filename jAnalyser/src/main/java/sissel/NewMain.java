@@ -11,6 +11,7 @@ import com.sun.jdi.connect.VMStartException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,10 @@ public class NewMain
         String options = "-cp G:\\Repository\\JAnalyser\\jAnalyser\\target\\classes";
         List<String> filterClassses = new LinkedList<>();
         filterClassses.add("sissel.HelloWorld");
+        LinkedList<Integer> bp = new LinkedList<>();
+        bp.add(37);
+        Map<String, List<Integer>> bpMap = new HashMap<>();
+        bpMap.put("sissel.HelloWorld", bp);
 
         VirtualMachineManager vmManager = Bootstrap.virtualMachineManager();
         LaunchingConnector connector = vmManager.defaultConnector();
@@ -47,11 +52,16 @@ public class NewMain
             //vm.setDebugTraceMode(1);
             Tracer tracer = new Tracer(vm);
             tracer.setFilterClasses(filterClassses);
+            tracer.setBreakpoints(bpMap);
             tracer.start();
             vm.resume();
 
+            tracer.join();
+
             // TODO: 2016/7/14 redirect
             Process process = vm.process();
+
+            System.out.println("===== Process Output =====");
 
             BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(), "gbk"));
             br.lines().forEach(System.out::println);
@@ -62,7 +72,7 @@ public class NewMain
             process.destroy();
         }
         // TODO: 2016/7/14 异常处理
-        catch (VMStartException | IllegalConnectorArgumentsException | IOException e)
+        catch (VMStartException | IllegalConnectorArgumentsException | IOException | InterruptedException e)
         {
             e.printStackTrace();
         }
