@@ -1,4 +1,4 @@
-package sissel;
+package sissel.classinfo;
 
 import java.util.NoSuchElementException;
 

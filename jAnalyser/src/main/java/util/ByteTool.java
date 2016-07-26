@@ -31,4 +31,9 @@ public class ByteTool
 
         return sum;
     }
+
+    public static int genFlags(byte head, byte tail)
+    {
+        return (head << 8) + tail;
+    }
 }
