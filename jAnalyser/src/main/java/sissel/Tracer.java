@@ -188,6 +188,12 @@ public class Tracer extends Thread
             {
                 e.printStackTrace();
             }
+
+            System.out.println("===== heap dump =====");
+            HeapDump heapDump = HeapDump.newInstance(virtualMachine);
+            System.out.println(heapDump.toString());
+            heapDump.initialize();
+            System.out.println("initialization over");
         }
     }
 }
