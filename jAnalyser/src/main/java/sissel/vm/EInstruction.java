@@ -79,10 +79,29 @@ public enum EInstruction
     breakpoint(0xca), impdepl1(0xfe), impdel11(0xff) // 保留指令
     ;
 
+    int byteCode;
+
     EInstruction(int byteCode)
     {
         this.byteCode = byteCode;
+
+        if (EInstructionArray.array[byteCode] == null)
+        {
+            EInstructionArray.array[byteCode] = this;
+        }
+        else
+        {
+            throw new UnknownError("duplicate byte code used");
+        }
     }
 
-    int byteCode;
+    public static EInstruction forr(int byteCode)
+    {
+        return EInstructionArray.array[byteCode];
+    }
+
+    static class EInstructionArray
+    {
+        public static EInstruction[] array = new EInstruction[256];
+    }
 }
