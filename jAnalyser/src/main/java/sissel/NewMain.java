@@ -7,6 +7,7 @@ import com.sun.jdi.connect.Connector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
 import com.sun.jdi.connect.LaunchingConnector;
 import com.sun.jdi.connect.VMStartException;
+import sissel.vm.Tracer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,13 +32,19 @@ public class NewMain
         String mainClass = "sissel.HelloWorld";
         String options = "-cp G:\\Repository\\JAnalyser\\jAnalyser\\target\\classes";
         List<String> filterClassses = new LinkedList<>();
-        filterClassses.add("sissel.HelloWorld");
-        LinkedList<Integer> bp = new LinkedList<>();
+        //filterClassses.add("sissel.HelloWorld");
+        filterClassses.add("sissel.test_cases.Add");
 
-        // breakpoint
-        bp.add(42);
         Map<String, List<Integer>> bpMap = new HashMap<>();
-        bpMap.put("sissel.HelloWorld", bp);
+        // breakpoint-main
+        //LinkedList<Integer> bp = new LinkedList<>();
+        //bp.add(43);
+        //bpMap.put("sissel.HelloWorld", bp);
+        // breakpoint-Add
+        LinkedList<Integer> bp_add = new LinkedList<>();
+        bp_add.add(16);
+        bpMap.put("sissel.test_cases.Add", bp_add);
+
 
         VirtualMachineManager vmManager = Bootstrap.virtualMachineManager();
         LaunchingConnector connector = vmManager.defaultConnector();

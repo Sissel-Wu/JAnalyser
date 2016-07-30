@@ -1,5 +1,7 @@
 package sissel;
 
+import sissel.test_cases.Add;
+
 import java.io.Serializable;
 import java.util.Scanner;
 
@@ -38,11 +40,9 @@ public class HelloWorld extends Father implements Serializable
 
         HelloWorld hw = new HelloWorld();
 
+        System.out.println(new Add().test());
         System.out.println(hello);
         System.out.println(goodbye);
-
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
     }
 
     @Override

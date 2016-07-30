@@ -1,9 +1,7 @@
-package sissel;
+package sissel.vm;
 
 import com.sun.jdi.*;
-import util.var;
 
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 

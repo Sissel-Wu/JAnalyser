@@ -1,4 +1,4 @@
-package sissel;
+package sissel.vm;
 
 import java.util.Stack;
 

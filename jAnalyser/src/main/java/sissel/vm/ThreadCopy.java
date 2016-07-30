@@ -1,4 +1,4 @@
-package sissel;
+package sissel.vm;
 
 /**
  * 线程的副本

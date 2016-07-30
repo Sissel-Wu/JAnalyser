@@ -1,8 +1,7 @@
 package sissel.classinfo;
 
-import util.ByteTool;
-import util.File2ByteArray;
-import util.var;
+import sissel.util.ByteTool;
+import sissel.util.File2ByteArray;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

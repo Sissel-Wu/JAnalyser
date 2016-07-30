@@ -1,4 +1,4 @@
-package sissel;
+package sissel.vm;
 
 import com.sun.jdi.*;
 import com.sun.jdi.event.*;
@@ -6,9 +6,8 @@ import com.sun.jdi.request.BreakpointRequest;
 import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequest;
 import com.sun.jdi.request.EventRequestManager;
-import util.DisplayString;
+import sissel.util.DisplayString;
 
-import java.lang.reflect.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -80,16 +79,6 @@ public class Tracer extends Thread
     @Override
     public void run()
     {
-        Class vmClass = virtualMachine.getClass();
-        try
-        {
-            java.lang.reflect.Method heapMethod = vmClass.getMethod("heapHisto", Object[].class);
-
-        } catch (NoSuchMethodException e)
-        {
-            e.printStackTrace();
-        }
-
         EventQueue eventQueue = virtualMachine.eventQueue();
         while (!vmExit)
         {
@@ -99,7 +88,8 @@ public class Tracer extends Thread
                 EventIterator eventIterator = eventSet.eventIterator();
                 while (eventIterator.hasNext())
                 {
-                    eventHandler.handleEvent(eventIterator.nextEvent());
+                    Event event = eventIterator.nextEvent();
+                    eventHandler.handleEvent(event);
                     eventSet.resume();
                 }
             } catch (InterruptedException e)
@@ -175,11 +165,13 @@ public class Tracer extends Thread
             try
             {
                 ThreadReference threadReference = event.thread();
-                StackFrame frame = threadReference.frame(threadReference.frameCount() - 1);
-                List<LocalVariable> visibleVars = frame.visibleVariables();
+                List<StackFrame> frames = threadReference.frames();
+                StackFrame currentFrame = frames.get(0);
+
+                List<LocalVariable> visibleVars = currentFrame.visibleVariables();
                 for (LocalVariable visibleVar : visibleVars)
                 {
-                    String info = strHelper.translate(frame, visibleVar, 0, DisplayString.SpecLevel.MAX);
+                    String info = strHelper.translate(currentFrame, visibleVar, 0, DisplayString.SpecLevel.MAX);
                     System.out.print(info);
                 }
             }

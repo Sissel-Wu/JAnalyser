@@ -1,6 +1,6 @@
 package sissel.classinfo;
 
-import util.ByteTool;
+import sissel.util.ByteTool;
 
 /**
  * 方法的信息

@@ -1,4 +1,4 @@
-package util;
+package sissel.util;
 
 import static org.junit.Assert.*;
 
