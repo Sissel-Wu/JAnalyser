@@ -194,6 +194,9 @@ public class Tracer extends Thread
             System.out.println(heapDump.toString());
             heapDump.initialize();
             System.out.println("initialization over");
+
+            Map<ObjectReference, ObjectInstance> checkee = heapDump.objMap.get("sissel.HelloWorld");
+            System.out.println("final over");
         }
     }
 }

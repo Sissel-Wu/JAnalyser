@@ -6,4 +6,9 @@ package sissel.classinfo;
  */
 public class FieldInfo extends FMInfo
 {
+    public FieldInfo(ClassBinary classBinary, int access_flags, String name, String descriptor,
+                     int attributes_count, AttributeInfo[] attributes)
+    {
+        super(classBinary,access_flags, name, descriptor, attributes_count, attributes);
+    }
 }

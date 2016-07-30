@@ -54,7 +54,7 @@ public class ObjectInstance
             return ((ShortValue)value).value();
         }
         // object reference
-        else if (value instanceof ObjectReference)
+        else if (value instanceof ObjectReference)// TODO: 2016/7/30 数组的值
         {
             HeapDump heapDump = HeapDump.getInstance();
             return heapDump.getByReference((ObjectReference) value);

@@ -14,7 +14,7 @@ public class HeapDump
     private static HeapDump singleton;
 
     private VirtualMachine vm;
-    private Map<String, Map<ObjectReference, ObjectInstance>> objMap;
+    Map<String, Map<ObjectReference, ObjectInstance>> objMap;
 
     public static HeapDump newInstance(VirtualMachine vm)
     {

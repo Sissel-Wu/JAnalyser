@@ -35,7 +35,7 @@ public class NewMain
         LinkedList<Integer> bp = new LinkedList<>();
 
         // breakpoint
-        bp.add(40);
+        bp.add(42);
         Map<String, List<Integer>> bpMap = new HashMap<>();
         bpMap.put("sissel.HelloWorld", bp);
 

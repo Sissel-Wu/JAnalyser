@@ -16,6 +16,7 @@ class Father
 public class HelloWorld extends Father implements Serializable
 {
     protected int val = 123;
+    protected String name = "hellsing";
 
     public static void main(String[] args)
     {

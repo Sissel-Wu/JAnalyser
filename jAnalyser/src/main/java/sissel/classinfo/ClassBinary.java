@@ -2,6 +2,7 @@ package sissel.classinfo;
 
 import util.ByteTool;
 import util.File2ByteArray;
+import util.var;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -79,22 +80,7 @@ public class ClassBinary
      */
     private int analyzeAttributes(int attributesOffset, AttributeInfo[] attributes)
     {
-        int attributesCount = ByteTool.bigEnd(bytes[attributesOffset], bytes[attributesOffset + 1]);
-
-        int current = attributesOffset + 2;
-        for (int i = 0; i < attributesCount; i++)
-        {
-            int attrIndex = ByteTool.bigEnd(bytes[current], bytes[current + 1]);
-            String name = extractString(attrIndex);
-            int length = ByteTool.bigEnd(bytes[current + 2], bytes[current + 3], bytes[current + 4], bytes[current + 5]);
-
-            AttributeInfo attributeInfo = new AttributeInfo(name, length, bytes, current + 6);
-            attributes[i] = attributeInfo;
-
-            current += 6 + length;
-        }
-
-        return current;
+        return AttributeInfo.analyzeHelp(this, bytes, attributesOffset, attributes);
     }
 
     private void analyzeInterfaces(int interfacesOffset)
@@ -116,17 +102,16 @@ public class ClassBinary
         int current = fieldsOffset + 2;
         for (int i = 0; i < fields_count; i++)
         {
-            FieldInfo fieldInfo = new FieldInfo();
+            int access_flags = ByteTool.genFlags(bytes[current], bytes[current + 1]);
+            String name = extractString(ByteTool.bigEnd(bytes[current + 2], bytes[current + 3]));
+            String descriptor = extractString(ByteTool.bigEnd(bytes[current + 4], bytes[current + 5]));
 
-            fieldInfo.access_flags = ByteTool.genFlags(bytes[current], bytes[current + 1]);
-            fieldInfo.name = extractString(ByteTool.bigEnd(bytes[current + 2], bytes[current + 3]));
-            fieldInfo.descriptor = extractString(ByteTool.bigEnd(bytes[current + 4], bytes[current + 5]));
+            int attributes_count = ByteTool.bigEnd(bytes[current + 6], bytes[current + 7]);
+            AttributeInfo[] attributes = new AttributeInfo[attributes_count];
 
-            fieldInfo.attributes_count = ByteTool.bigEnd(bytes[current + 6], bytes[current + 7]);
-            fieldInfo.attributes = new AttributeInfo[fieldInfo.attributes_count];
-
+            current = analyzeAttributes(current + 6, attributes);
+            FieldInfo fieldInfo = new FieldInfo(this, access_flags, name, descriptor, attributes_count, attributes);
             fields[i] = fieldInfo;
-            current = analyzeAttributes(current + 6, fieldInfo.attributes);
         }
 
         return current;
@@ -140,17 +125,16 @@ public class ClassBinary
         int current = methodsOffset + 2;
         for (int i = 0; i < methods_count; i++)
         {
-            MethodInfo methodInfo = new MethodInfo();
+            int access_flags = ByteTool.genFlags(bytes[current], bytes[current + 1]);
+            String name = extractString(ByteTool.bigEnd(bytes[current + 2], bytes[current + 3]));
+            String descriptor = extractString(ByteTool.bigEnd(bytes[current + 4], bytes[current + 5]));
 
-            methodInfo.access_flags = ByteTool.genFlags(bytes[current], bytes[current + 1]);
-            methodInfo.name = extractString(ByteTool.bigEnd(bytes[current + 2], bytes[current + 3]));
-            methodInfo.descriptor = extractString(ByteTool.bigEnd(bytes[current + 4], bytes[current + 5]));
+            int attributes_count = ByteTool.bigEnd(bytes[current + 6], bytes[current + 7]);
+            AttributeInfo[] attributes = new AttributeInfo[attributes_count];
 
-            methodInfo.attributes_count = ByteTool.bigEnd(bytes[current + 6], bytes[current + 7]);
-            methodInfo.attributes = new AttributeInfo[methodInfo.attributes_count];
-
+            current = analyzeAttributes(current + 6, attributes); // 先解析attributes，否则方法构造会失败
+            MethodInfo methodInfo = new MethodInfo(this, access_flags, name, descriptor, attributes_count, attributes);
             methods[i] = methodInfo;
-            current = analyzeAttributes(current + 6, methodInfo.attributes);
         }
 
         return current;
@@ -203,7 +187,7 @@ public class ClassBinary
         analyzeAttributes(attributesOffset, attributes);
     }
 
-    private String extractStrFromClassInfo(int cl_index)
+    public String extractStrFromClassInfo(int cl_index)
     {
         int offset = cp_index[cl_index];
         assert bytes[offset] == 7;
@@ -212,7 +196,7 @@ public class ClassBinary
         return extractString(utf8_index);
     }
 
-    private String extractString(int index)
+    public String extractString(int index)
     {
         int offset = cp_index[index];
         assert bytes[offset] == 1;
