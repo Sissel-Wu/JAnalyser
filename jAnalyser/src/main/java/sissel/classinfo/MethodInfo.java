@@ -8,15 +8,15 @@ import sissel.util.ByteTool;
  */
 public class MethodInfo extends FMInfo
 {
-    int max_stack;
-    int max_locals;
-    int code_length;
-    byte[] code;
-    int exception_table_length;
-    ExceptionInfo[] exception_info_table;
+    public int max_stack;
+    public int max_locals;
+    public int code_length;
+    public byte[] code;
+    public int exception_table_length;
+    public ExceptionInfo[] exception_info_table;
 
-    int method_attr_count;
-    AttributeInfo[] method_attr;
+    public int method_attr_count;
+    public AttributeInfo[] method_attr;
 
     private void analyzeAttributes(byte[] codeAttrInfo, int attributesOffset)
     {

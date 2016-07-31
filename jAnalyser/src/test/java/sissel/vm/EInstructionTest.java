@@ -12,6 +12,6 @@ public class EInstructionTest
     public void testDuplicate()
     {
         EInstruction[] all = EInstruction.values();
-        System.out.println(all.length);
+        assertEquals(205, all.length);
     }
 }
