@@ -46,8 +46,15 @@ public class ByteTool
         int sum = 0;
         for (byte B : bytes)
         {
-            --length;
-            sum += B << (length * 8);
+            if (B < 0 && length != bytes.length)
+            {
+                int s = (int)B + 256;
+                sum += s << ((--length) * 8);
+            }
+            else
+            {
+                sum += B << ((--length) * 8);
+            }
         }
 
         return sum;

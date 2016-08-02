@@ -7,4 +7,6 @@ package sissel.classinfo;
 public interface IClass
 {
     public Object getItem(int index);
+
+    public MethodInfo getMethodInfo(String name, String descriptor);
 }

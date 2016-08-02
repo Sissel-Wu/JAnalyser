@@ -257,6 +257,19 @@ public class ClassBinary implements IClass
         throw new IndexOutOfBoundsException();
     }
 
+    public MethodInfo getMethodInfo(String name, String descriptor)
+    {
+        for (MethodInfo method : methods)
+        {
+            if (method.name.equals(name) && method.descriptor.equals(descriptor))
+            {
+                return method;
+            }
+        }
+
+        throw new NoSuchMethodError();
+    }
+
     public ClassBinary(String filePath) throws IOException
     {
         this.bytes = File2ByteArray.read(filePath);

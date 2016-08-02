@@ -36,6 +36,11 @@ public class ThreadCopy
         return stackFrames.pop();
     }
 
+    public void start()
+    {
+        executor.start();
+    }
+
     public enum ThreadState
     {
         PREPARE,

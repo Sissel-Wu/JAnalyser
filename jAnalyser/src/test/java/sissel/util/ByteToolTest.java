@@ -21,6 +21,8 @@ public class ByteToolTest
     {
         assertEquals(257, ByteTool.bigEnd((byte)1, (byte)1));
         assertEquals(-256, ByteTool.bigEnd((byte)-1, (byte)0));
+        assertEquals(Integer.MAX_VALUE, ByteTool.bigEnd((byte)127, (byte)-1, (byte)-1, (byte)-1));
+        assertEquals(-1, ByteTool.bigEnd((byte)-1, (byte)-1, (byte)-1, (byte)-1));
     }
 
     @org.junit.Test

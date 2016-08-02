@@ -97,7 +97,14 @@ public enum EInstruction
 
     public static EInstruction forr(int byteCode)
     {
-        return EInstructionArray.array[byteCode];
+        if (byteCode < 0)
+        {
+            return EInstructionArray.array[256 + byteCode];
+        }
+        else
+        {
+            return EInstructionArray.array[byteCode];
+        }
     }
 
     static class EInstructionArray
