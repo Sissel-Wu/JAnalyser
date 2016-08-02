@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
  * 解析二进制Class文件
  * Created by Sissel on 2016/7/25.
  */
-public class ClassBinary
+public class ClassBinary implements IClass
 {
     private byte[] bytes;
     private int[] cp_index; // 输入常量池中的索引号，得到在bytes中对应的位置
@@ -51,7 +51,7 @@ public class ClassBinary
             EConstPoolItem item = EConstPoolItem.getByTag(bytes[offset]);
             if (item == EConstPoolItem.UTF8_INFO)
             {
-                int length = ByteTool.bigEnd(bytes[offset + 1], bytes[offset + 2]);
+                int length = ByteTool.uBigEnd(bytes[offset + 1], bytes[offset + 2]);
                 offset += length + 3;
             }
             else
@@ -84,28 +84,28 @@ public class ClassBinary
 
     private void analyzeInterfaces(int interfacesOffset)
     {
-        interfaces_count = ByteTool.bigEnd(bytes[interfacesOffset], bytes[interfacesOffset + 1]);
+        interfaces_count = ByteTool.uBigEnd(bytes[interfacesOffset], bytes[interfacesOffset + 1]);
         interfaces = new String[interfaces_count];
         for (int i = 0; i < interfaces_count; i++)
         {
-            int index = ByteTool.bigEnd(bytes[interfacesOffset + i + 2], bytes[interfacesOffset + i + 3]);
+            int index = ByteTool.uBigEnd(bytes[interfacesOffset + i + 2], bytes[interfacesOffset + i + 3]);
             interfaces[i] = extractStrFromClassInfo(index);
         }
     }
 
     private int analyzeFields(int fieldsOffset)
     {
-        fields_count = ByteTool.bigEnd(bytes[fieldsOffset], bytes[fieldsOffset + 1]);
+        fields_count = ByteTool.uBigEnd(bytes[fieldsOffset], bytes[fieldsOffset + 1]);
         fields = new FieldInfo[fields_count];
 
         int current = fieldsOffset + 2;
         for (int i = 0; i < fields_count; i++)
         {
             int access_flags = ByteTool.genFlags(bytes[current], bytes[current + 1]);
-            String name = extractString(ByteTool.bigEnd(bytes[current + 2], bytes[current + 3]));
-            String descriptor = extractString(ByteTool.bigEnd(bytes[current + 4], bytes[current + 5]));
+            String name = extractString(ByteTool.uBigEnd(bytes[current + 2], bytes[current + 3]));
+            String descriptor = extractString(ByteTool.uBigEnd(bytes[current + 4], bytes[current + 5]));
 
-            int attributes_count = ByteTool.bigEnd(bytes[current + 6], bytes[current + 7]);
+            int attributes_count = ByteTool.uBigEnd(bytes[current + 6], bytes[current + 7]);
             AttributeInfo[] attributes = new AttributeInfo[attributes_count];
 
             current = analyzeAttributes(current + 6, attributes);
@@ -118,17 +118,17 @@ public class ClassBinary
 
     private int analyzeMethods(int methodsOffset)
     {
-        methods_count = ByteTool.bigEnd(bytes[methodsOffset], bytes[methodsOffset + 1]);
+        methods_count = ByteTool.uBigEnd(bytes[methodsOffset], bytes[methodsOffset + 1]);
         methods = new MethodInfo[methods_count];
 
         int current = methodsOffset + 2;
         for (int i = 0; i < methods_count; i++)
         {
             int access_flags = ByteTool.genFlags(bytes[current], bytes[current + 1]);
-            String name = extractString(ByteTool.bigEnd(bytes[current + 2], bytes[current + 3]));
-            String descriptor = extractString(ByteTool.bigEnd(bytes[current + 4], bytes[current + 5]));
+            String name = extractString(ByteTool.uBigEnd(bytes[current + 2], bytes[current + 3]));
+            String descriptor = extractString(ByteTool.uBigEnd(bytes[current + 4], bytes[current + 5]));
 
-            int attributes_count = ByteTool.bigEnd(bytes[current + 6], bytes[current + 7]);
+            int attributes_count = ByteTool.uBigEnd(bytes[current + 6], bytes[current + 7]);
             AttributeInfo[] attributes = new AttributeInfo[attributes_count];
 
             current = analyzeAttributes(current + 6, attributes); // 先解析attributes，否则方法构造会失败
@@ -151,22 +151,22 @@ public class ClassBinary
         if (bytes[0] != -54 || bytes[1] != -2 || bytes[2] != -70 || bytes[3] != -66) throw new ClassFormatError();
 
         // versions
-        minor_version = ByteTool.bigEnd(bytes[4], bytes[5]);
-        major_version = ByteTool.bigEnd(bytes[6], bytes[7]);
+        minor_version = ByteTool.uBigEnd(bytes[4], bytes[5]);
+        major_version = ByteTool.uBigEnd(bytes[6], bytes[7]);
 
         // constant pool count
-        constant_pool_count = ByteTool.bigEnd(bytes[8], bytes[9]);
+        constant_pool_count = ByteTool.uBigEnd(bytes[8], bytes[9]);
         int over_index = analyzeConstPool();
 
         // access flags
         access_flags = ByteTool.genFlags(bytes[over_index], bytes[over_index + 1]);
 
         // this_class
-        int this_class_index = ByteTool.bigEnd(bytes[over_index + 2], bytes[over_index + 3]);
+        int this_class_index = ByteTool.uBigEnd(bytes[over_index + 2], bytes[over_index + 3]);
         this_class = extractStrFromClassInfo(this_class_index);
 
         // super_class
-        int super_class_index = ByteTool.bigEnd(bytes[over_index + 4], bytes[over_index + 5]);
+        int super_class_index = ByteTool.uBigEnd(bytes[over_index + 4], bytes[over_index + 5]);
         super_class = extractStrFromClassInfo(super_class_index);
 
         // interfaces
@@ -181,7 +181,7 @@ public class ClassBinary
         int attributesOffset = analyzeMethods(methodsOffset);
 
         // attributes
-        attributes_count = ByteTool.bigEnd(bytes[attributesOffset], bytes[attributesOffset + 1]);
+        attributes_count = ByteTool.uBigEnd(bytes[attributesOffset], bytes[attributesOffset + 1]);
         attributes = new AttributeInfo[attributes_count];
         analyzeAttributes(attributesOffset, attributes);
     }
@@ -190,7 +190,7 @@ public class ClassBinary
     {
         int offset = cp_index[cl_index];
         assert bytes[offset] == 7;
-        int utf8_index = ByteTool.bigEnd(bytes[offset + 1], bytes[offset + 2]);
+        int utf8_index = ByteTool.uBigEnd(bytes[offset + 1], bytes[offset + 2]);
 
         return extractString(utf8_index);
     }
@@ -199,7 +199,7 @@ public class ClassBinary
     {
         int offset = cp_index[index];
         assert bytes[offset] == 1;
-        int length = ByteTool.bigEnd(bytes[offset + 1], bytes[offset + 2]);
+        int length = ByteTool.uBigEnd(bytes[offset + 1], bytes[offset + 2]);
 
         byte[] utf8Bytes = new byte[length];
         System.arraycopy(bytes, offset + 3, utf8Bytes, 0, length);
@@ -213,6 +213,48 @@ public class ClassBinary
             e.printStackTrace();
             return null;
         }
+    }
+
+    public int extractInt(int index)
+    {
+        int offset = cp_index[index];
+        assert bytes[offset] == 3;
+
+        return ByteTool.bigEnd(bytes[offset + 1], bytes[offset + 2], bytes[offset + 3], bytes[offset + 4]);
+    }
+
+    public long extractLong(int index)
+    {
+        return ByteTool.bigEndLong(bytes, cp_index[index]);
+    }
+
+    public float extractFloat(int index)
+    {
+        return ByteTool.floatFrom(bytes, cp_index[index]);
+    }
+
+    public double extractDouble(int index)
+    {
+        return ByteTool.doubleFrom(bytes, cp_index[index]);
+    }
+
+    public Object getItem(int index)
+    {
+        switch (bytes[cp_index[index]])
+        {
+            case 1: // utf8_info
+                return extractString(index);
+            case 3: // int_info
+                return extractInt(index);
+            case 4: // float_info
+                return extractFloat(index);
+            case 5: // long_info
+                return extractLong(index);
+            case 6: // double_info
+                return extractDouble(index);
+        }
+
+        throw new IndexOutOfBoundsException();
     }
 
     public ClassBinary(String filePath) throws IOException

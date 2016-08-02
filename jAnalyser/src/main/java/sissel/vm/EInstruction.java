@@ -79,7 +79,7 @@ public enum EInstruction
     breakpoint(0xca), impdepl1(0xfe), impdel11(0xff) // 保留指令
     ;
 
-    int byteCode;
+    public int byteCode;
 
     EInstruction(int byteCode)
     {

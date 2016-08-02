@@ -11,8 +11,6 @@ public class Add
     public int test()
     {
         int ia = 1, ib = 2, ic = Integer.MAX_VALUE;
-        ia = ia + v; // 3
-        ib = ic + ib; // -Integer.MAX_VALUE
-        return ia + ib;
+        return ia + ib +ic;
     }
 }

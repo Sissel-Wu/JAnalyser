@@ -23,14 +23,14 @@ public class AttributeInfo
 
     public static int analyzeHelp(ClassBinary classBinary, byte[] bytes, int beginOffset, AttributeInfo[] results)
     {
-        int attributesCount = ByteTool.bigEnd(bytes[beginOffset], bytes[beginOffset + 1]);
+        int attributesCount = ByteTool.uBigEnd(bytes[beginOffset], bytes[beginOffset + 1]);
 
         int current = beginOffset + 2;
         for (int i = 0; i < attributesCount; i++)
         {
-            int attrIndex = ByteTool.bigEnd(bytes[current], bytes[current + 1]);
+            int attrIndex = ByteTool.uBigEnd(bytes[current], bytes[current + 1]);
             String name = classBinary.extractString(attrIndex);
-            int length = ByteTool.bigEnd(bytes[current + 2], bytes[current + 3], bytes[current + 4], bytes[current + 5]);
+            int length = ByteTool.uBigEnd(bytes[current + 2], bytes[current + 3], bytes[current + 4], bytes[current + 5]);
 
             AttributeInfo attributeInfo = new AttributeInfo(name, length, bytes, current + 6);
             results[i] = attributeInfo;

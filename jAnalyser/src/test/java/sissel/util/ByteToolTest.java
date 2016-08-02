@@ -10,10 +10,17 @@ public class ByteToolTest
 {
 
     @org.junit.Test
+    public void testUBigEnd() throws Exception
+    {
+        assertEquals(257, ByteTool.uBigEnd((byte)1, (byte)1));
+        assertEquals(255 * 256, ByteTool.uBigEnd((byte)-1, (byte)0));
+    }
+
+    @org.junit.Test
     public void testBigEnd() throws Exception
     {
         assertEquals(257, ByteTool.bigEnd((byte)1, (byte)1));
-        assertEquals(255 * 256, ByteTool.bigEnd((byte)-1, (byte)0));
+        assertEquals(-256, ByteTool.bigEnd((byte)-1, (byte)0));
     }
 
     @org.junit.Test

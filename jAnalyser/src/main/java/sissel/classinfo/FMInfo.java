@@ -6,13 +6,13 @@ package sissel.classinfo;
  */
 public abstract class FMInfo
 {
-    ClassBinary classBinary;
+    public ClassBinary classBinary;
 
-    int access_flags;
-    String name;
-    String descriptor;
-    int attributes_count;
-    AttributeInfo[] attributes;
+    public int access_flags;
+    public String name;
+    public String descriptor;
+    public int attributes_count;
+    public AttributeInfo[] attributes;
 
     public FMInfo(ClassBinary classBinary, int access_flags, String name, String descriptor,
                   int attributes_count, AttributeInfo[] attributes)
