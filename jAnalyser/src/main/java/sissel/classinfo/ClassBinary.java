@@ -225,17 +225,17 @@ public class ClassBinary implements IClass
 
     public long extractLong(int index)
     {
-        return ByteTool.bigEndLong(bytes, cp_index[index]);
+        return ByteTool.bigEndLong(bytes, cp_index[index] + 1);
     }
 
     public float extractFloat(int index)
     {
-        return ByteTool.floatFrom(bytes, cp_index[index]);
+        return ByteTool.floatFrom(bytes, cp_index[index] + 1);
     }
 
     public double extractDouble(int index)
     {
-        return ByteTool.doubleFrom(bytes, cp_index[index]);
+        return ByteTool.doubleFrom(bytes, cp_index[index] + 1);
     }
 
     public Object getItem(int index)

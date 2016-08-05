@@ -60,7 +60,11 @@ public class MyStackFrame
 
     public Object getLocal(int i)
     {
-        localVariables[i].toString();
         return localVariables[i];
+    }
+
+    public Object peek()
+    {
+        return operandStack.peek();
     }
 }

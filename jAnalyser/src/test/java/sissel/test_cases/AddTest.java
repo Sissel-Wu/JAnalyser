@@ -1,6 +1,7 @@
 package sissel.test_cases;
 
 import sissel.classinfo.ClassBinary;
+import sissel.util.TestTool;
 import sissel.vm.MyStackFrame;
 import sissel.vm.ThreadCopy;
 
@@ -14,22 +15,28 @@ import static org.junit.Assert.*;
  */
 public class AddTest
 {
-    @org.junit.Test
-    public void testAdd()
-    {
-        String path = Add.class.getResource("Add.class").getPath();
-        try
-        {
-            ClassBinary clbin = new ClassBinary(path);
-            MyStackFrame stackFrame = new MyStackFrame(clbin.getMethodInfo("test", "()I"));
 
-            ThreadCopy threadCopy = new ThreadCopy();
-            threadCopy.pushStackFrame(stackFrame);
-            threadCopy.start();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+    @org.junit.Test
+    public void testInt()
+    {
+        TestTool.test("Add", "testInt", "()I");
+    }
+
+    @org.junit.Test
+    public void testLong()
+    {
+        TestTool.test("Add", "testLong", "()J");
+    }
+
+    @org.junit.Test
+    public void testFloat()
+    {
+        TestTool.test("Add", "testFloat", "()F");
+    }
+
+    @org.junit.Test
+    public void testDouble()
+    {
+        TestTool.test("Add", "testDouble", "()D");
     }
 }

@@ -4,6 +4,9 @@ import sissel.classinfo.ClassBinary;
 import sissel.util.ByteTool;
 import sissel.vm.EInstruction;
 import sissel.vm.MyStackFrame;
+import sissel.vm.ObjectInstance;
+
+import java.util.DoubleSummaryStatistics;
 
 /**
  * 处理常量指令
@@ -157,6 +160,15 @@ public class ConstHandler
         return 1;
     }
 
+    // xload index
+    public static void pushLocal(MyStackFrame stackFrame, EInstruction instruction, int index)
+    {
+        assert instruction.byteCode >= 0x15 && instruction.byteCode <= 0x19;
+
+        stackFrame.pushStack(stackFrame.getLocal(index));
+    }
+
+    // xstore_<n>
     public static int storeLocal(MyStackFrame stackFrame, EInstruction instruction)
     {
         int index = -1;
@@ -196,5 +208,170 @@ public class ConstHandler
         }
         stackFrame.setLocal(index, stackFrame.popStack());
         return 1;
+    }
+
+    public static void storeLocal(MyStackFrame stackFrame, EInstruction instruction, int index)
+    {
+        // xstore
+        assert instruction.byteCode >= 0x36 && instruction.byteCode <= 0x3a;
+
+        stackFrame.setLocal(index, stackFrame.popStack());
+    }
+
+    public static int pushArrayLocal(MyStackFrame stackFrame, EInstruction instruction)
+    {
+        // xaload
+        assert instruction.byteCode >= 0x2e && instruction.byteCode <= 0x35;
+
+        Integer index = (Integer) stackFrame.popStack();
+        ObjectInstance objectInstance = (ObjectInstance)stackFrame.popStack();
+        stackFrame.pushStack(objectInstance.getOfArray(index));
+
+        return 1;
+    }
+
+    public static int storeArrayLocal(MyStackFrame stackFrame, EInstruction instruction)
+    {
+        // xastore
+        assert instruction.byteCode >= 0x4f && instruction.byteCode <= 0x56;
+
+        Object value = stackFrame.popStack();
+        Integer index = (Integer) stackFrame.popStack();
+        ObjectInstance arrayRef = (ObjectInstance)stackFrame.popStack();
+        arrayRef.setOfArray(index, value);
+
+        return 1;
+    }
+
+    public static int stackOp(MyStackFrame stackFrame, EInstruction instruction)
+    {
+        Object top, nonTop;
+        switch (instruction)
+        {
+            case pop:
+                stackFrame.popStack();
+                break;
+            case pop2:
+                top = stackFrame.popStack();
+                if (!(top instanceof Long || top instanceof Double) )
+                {
+                    stackFrame.popStack();
+                }
+                break;
+            case dup:
+                stackFrame.pushStack(stackFrame.peek());
+                break;
+            case dup_x1:
+                top = stackFrame.popStack();
+                nonTop = stackFrame.popStack();
+                stackFrame.pushStack(top);
+                stackFrame.pushStack(nonTop);
+                stackFrame.pushStack(top);
+                break;
+            case dup_x2:
+                top = stackFrame.popStack();
+                nonTop = stackFrame.popStack();
+                if (nonTop instanceof Long || nonTop instanceof Double)
+                {
+                    stackFrame.pushStack(top);
+                    stackFrame.pushStack(nonTop);
+                    stackFrame.pushStack(top);
+                }
+                else
+                {
+                    Object third = stackFrame.popStack();
+                    stackFrame.pushStack(top);
+                    stackFrame.pushStack(third);
+                    stackFrame.pushStack(nonTop);
+                    stackFrame.pushStack(top);
+                }
+                break;
+            case dup2:
+                top = stackFrame.popStack();
+                if (top instanceof Long || top instanceof Double)
+                {
+                    stackFrame.pushStack(top);
+                    stackFrame.pushStack(top);
+                }
+                else
+                {
+                    nonTop = stackFrame.peek();
+                    stackFrame.pushStack(top);
+                    stackFrame.pushStack(nonTop);
+                    stackFrame.pushStack(top);
+                }
+                break;
+            case dup2_x1:
+                top = stackFrame.popStack();
+                if (top instanceof Long || top instanceof Double)
+                {
+                    nonTop = stackFrame.popStack();
+                    stackFrame.pushStack(top);
+                    stackFrame.pushStack(nonTop);
+                    stackFrame.pushStack(top);
+                }
+                else
+                {
+                    nonTop = stackFrame.popStack();
+                    Object third = stackFrame.popStack();
+                    stackFrame.pushStack(nonTop);
+                    stackFrame.pushStack(top);
+                    stackFrame.pushStack(third);
+                    stackFrame.pushStack(nonTop);
+                    stackFrame.pushStack(top);
+                }
+                break;
+            case dup2_x2:
+                top = stackFrame.popStack();
+                nonTop = stackFrame.popStack();
+                if (top instanceof Long || top instanceof Double)
+                {
+                    if (nonTop instanceof Long || nonTop instanceof Double)
+                    {
+                        stackFrame.pushStack(top);
+                        stackFrame.pushStack(nonTop);
+                        stackFrame.pushStack(top);
+                    }
+                    else
+                    {
+                        Object third = stackFrame.popStack();
+                        stackFrame.pushStack(top);
+                        stackFrame.pushStack(third);
+                        stackFrame.pushStack(nonTop);
+                        stackFrame.pushStack(top);
+                    }
+                }
+                else
+                {
+                    Object third = stackFrame.popStack();
+                    if (third instanceof Long || third instanceof Double)
+                    {
+                        stackFrame.pushStack(nonTop);
+                        stackFrame.pushStack(top);
+                        stackFrame.pushStack(third);
+                        stackFrame.pushStack(nonTop);
+                        stackFrame.pushStack(top);
+                    }
+                    else
+                    {
+                        Object fourth = stackFrame.popStack();
+                        stackFrame.pushStack(nonTop);
+                        stackFrame.pushStack(top);
+                        stackFrame.pushStack(fourth);
+                        stackFrame.pushStack(third);
+                        stackFrame.pushStack(nonTop);
+                        stackFrame.pushStack(top);
+                    }
+                }
+                break;
+            case swap:
+                top = stackFrame.popStack();
+                nonTop = stackFrame.popStack();
+                stackFrame.pushStack(top);
+                stackFrame.pushStack(nonTop);
+                break;
+        }
+
+        throw new IndexOutOfBoundsException();
     }
 }
