@@ -96,13 +96,45 @@ public class ThreadExecutor
             {
                 pc += CalculateHandler.raw(stackFrame, instruction);
             }
-            else if (byteCode == 0x84)
+            else if (byteCode == 0x84) // iinc
             {
                 pc += CalculateHandler.iinc(stackFrame, ByteTool.uBigEnd(byteCodes[pc + 1]), byteCodes[pc + 2]);
             }
-            else if (byteCode >= 0x85 && byteCode <= 0x93)
+            else if (byteCode >= 0x85 && byteCode <= 0x93) // x2y
             {
                 pc += CalculateHandler.transform(stackFrame, instruction);
+            }
+            else if (byteCode >= 0x94 && byteCode <= 0x98) // xcmp<lg>
+            {
+                pc += CalculateHandler.compare(stackFrame, instruction);
+            }
+            else if (byteCode >= 0x99 && byteCode <= 0xa4) // if, if_icmp
+            {
+                pc = JumpHandler.iBranch(stackFrame, instruction, byteCodes, pc);
+            }
+            else if (byteCode >= 0xa5 && byteCode <= 0xa6) // if_acmp
+            {
+                pc = JumpHandler.aBranch(stackFrame, instruction, byteCodes, pc);
+            }
+            else if (byteCode == 0xa7 || byteCode == 0xc8) // goto
+            {
+                pc = JumpHandler.go(instruction, byteCodes, pc);
+            }
+            else if (byteCode == 0xa8 || byteCode == 0xc9)
+            {
+                pc += JumpHandler.jsr(stackFrame, instruction, byteCodes, pc);
+            }
+            else if (byteCode == 0xa9)
+            {
+                pc = JumpHandler.ret(stackFrame, instruction, byteCodes, pc);
+            }
+            else if (byteCode == 0xaa)
+            {
+                pc = JumpHandler.tableSwitch(stackFrame, instruction, byteCodes, pc);
+            }
+            else if (byteCode == 0xab)
+            {
+                pc = JumpHandler.lookupSwitch(stackFrame, instruction, byteCodes, pc);
             }
             else if (byteCode >= 0xac && byteCode <= 0xb1) // xreturn
             {
@@ -115,7 +147,16 @@ public class ThreadExecutor
             }
             else
             {
-                throw new NotImplementedException();
+                switch (instruction)
+                {
+                    case arraylength:
+                        pc += ObjectHandler.length(stackFrame);
+                        break;
+                    case ifnull:
+                    case ifnonnull:
+                        pc = JumpHandler.aBranch(stackFrame, instruction, byteCodes, pc);
+                        break;
+                }
             }
         }
     }

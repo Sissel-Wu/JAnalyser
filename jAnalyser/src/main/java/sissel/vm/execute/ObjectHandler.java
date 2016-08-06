@@ -28,4 +28,13 @@ public class ObjectHandler
         }
         throw new IndexOutOfBoundsException();
     }
+
+    // arraylength
+    public static int length(MyStackFrame stackFrame)
+    {
+        ObjectInstance arrayRef = (ObjectInstance) stackFrame.popStack();
+        stackFrame.pushStack(arrayRef.lengthOfArray());
+
+        return 1;
+    }
 }

@@ -79,4 +79,14 @@ public class ByteTool
     {
         return ByteBuffer.wrap(bytes, offset, 8).order(ByteOrder.BIG_ENDIAN).getDouble();
     }
+
+    public static int gen32(byte[] bytes, int offset)
+    {
+        return ByteTool.bigEnd(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]);
+    }
+
+    public static int gen32u(byte[] bytes, int offset)
+    {
+        return ByteTool.uBigEnd(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]);
+    }
 }

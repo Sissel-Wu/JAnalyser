@@ -19,8 +19,6 @@ public class ObjectInstance
     // 若是自己创建的数组类型，映射到这里
     Object[] array;
 
-
-
     /**
      * 从vm中的ObjectReference初始化
      * @param reference 对应的ObjectReference
@@ -148,5 +146,10 @@ public class ObjectInstance
     public void setOfArray(int index, Object value)
     {
         array[index] = value;
+    }
+
+    public int lengthOfArray()
+    {
+        return array.length;
     }
 }

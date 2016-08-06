@@ -3,6 +3,8 @@ package sissel.vm.execute;
 import sissel.vm.EInstruction;
 import sissel.vm.MyStackFrame;
 
+import java.util.Objects;
+
 /**
  * 处理计算
  * Created by Sissel on 2016/8/2.
@@ -220,6 +222,85 @@ public class CalculateHandler
             case i2s:
                 int i6 = (Integer)stackFrame.popStack();
                 stackFrame.pushStack((int)(short)i6);
+                break;
+        }
+        return 1;
+    }
+
+    public static int compare(MyStackFrame stackFrame, EInstruction instruction)
+    {
+        Object val2 = stackFrame.popStack();
+        Object val1 = stackFrame.popStack();
+        switch (instruction)
+        {
+            case lcmp:
+                Long l1 = (Long)val1, l2 = (Long)val2;
+                if (l1 > l2)
+                {
+                    stackFrame.pushStack(1);
+                }
+                else if (l1 < l2)
+                {
+                    stackFrame.pushStack(-1);
+                }
+                else
+                {
+                    stackFrame.pushStack(0);
+                }
+                break;
+            case fcmpl:
+            case fcmpg:
+                Float f1 = (Float)val1, f2 = (Float)val2;
+                if (f1.equals(Float.NaN) || f2.equals(Float.NaN))
+                {
+                    if (instruction == EInstruction.fcmpl)
+                    {
+                        stackFrame.pushStack(-1);
+                    }
+                    else
+                    {
+                        stackFrame.pushStack(1);
+                    }
+                }
+                else if (f1 > f2)
+                {
+                    stackFrame.pushStack(1);
+                }
+                else if (f1 < f2)
+                {
+                    stackFrame.pushStack(-1);
+                }
+                else
+                {
+                    stackFrame.pushStack(0);
+                }
+                break;
+            case dcmpl:
+            case dcmpg:
+                Double d1 = (Double)val1, d2 = (Double)val2;
+                if (d1.equals(Double.NaN) || d2.equals(Double.NaN))
+                {
+                    if (instruction == EInstruction.dcmpl)
+                    {
+                        stackFrame.pushStack(-1);
+                    }
+                    else
+                    {
+                        stackFrame.pushStack(1);
+                    }
+                }
+                else if (d1 > d2)
+                {
+                    stackFrame.pushStack(1);
+                }
+                else if (d1 < d2)
+                {
+                    stackFrame.pushStack(-1);
+                }
+                else
+                {
+                    stackFrame.pushStack(0);
+                }
                 break;
         }
         return 1;
