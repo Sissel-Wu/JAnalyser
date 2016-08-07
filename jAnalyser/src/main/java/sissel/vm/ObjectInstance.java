@@ -72,57 +72,6 @@ public class ObjectInstance
         }
     }
 
-    private Object value2Obj(Value value)
-    {
-        // primitive value
-        if (value instanceof BooleanValue)
-        {
-            return ((BooleanValue) value).value();
-        }
-        else if (value instanceof ByteValue)
-        {
-            return ((ByteValue)value).value();
-        }
-        else if (value instanceof CharValue)
-        {
-            return ((CharValue)value).value();
-        }
-        else if (value instanceof DoubleValue)
-        {
-            return ((DoubleValue)value).value();
-        }
-        else if (value instanceof FloatValue)
-        {
-            return ((FloatValue)value).value();
-        }
-        else if (value instanceof IntegerValue)
-        {
-            return ((IntegerValue)value).value();
-        }
-        else if (value instanceof LongValue)
-        {
-            return ((LongValue)value).value();
-        }
-        else if (value instanceof ShortValue)
-        {
-            return ((ShortValue)value).value();
-        }
-        // object reference
-        else if (value instanceof ObjectReference)// TODO: 2016/7/30 数组的值
-        {
-            HeapDump heapDump = HeapDump.getInstance();
-            return heapDump.getByReference((ObjectReference) value);
-        }
-        else if (value instanceof VoidValue)
-        {
-            System.err.println("ObjectInstance::value2Obj: void value");
-            return null;
-        }
-
-        assert value == null;
-        return null;
-    }
-
     /**
      * 初始化域信息
      */
@@ -130,11 +79,13 @@ public class ObjectInstance
     {
         fieldMap = new TreeMap<>();
         Map<Field, Value> mapInRef = reference.getValues(reference.referenceType().allFields());
+        HeapDump heap = HeapDump.getInstance();
 
         for (Map.Entry<Field, Value> entry : mapInRef.entrySet())
         {
+            Field field = entry.getKey();
             Value value = entry.getValue();
-            fieldMap.put(entry.getKey().name(), value2Obj(value));
+            fieldMap.put(field.name(), heap.value2Obj(value));
         }
     }
 

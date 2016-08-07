@@ -18,30 +18,18 @@ public class HelloWorld extends Father implements Serializable
 {
     protected int val = 123;
     protected String name = "hellsing";
+    private static int id = 12450;
 
     public static void main(String[] args)
     {
-        int a = 12;
-        byte b = 1;
-        long l = 123141412312L;
-        short s = 1234;
-        char c = 'c';
+        HelloWorld hw1 = new HelloWorld();
+        HelloWorld hw2 = new HelloWorld();
+        SeparateTest t1 = new SeparateTest();
+        hw1.val = 1;
+        hw2.val = 2;
 
-        boolean bl = false;
-
-        double d = 1.234;
-        float f = 2.442f;
-
-        String hello = "hello, world!";
-        String goodbye = "goodbye";
-
-        double[] ds = new double[]{1.2, 2.33, 3.5, 8.7};
-
-        HelloWorld hw = new HelloWorld();
-
-        System.out.println(new Add().testInt());
-        System.out.println(hello);
-        System.out.println(goodbye);
+        System.out.println("hello");
+        System.out.println(", world");
     }
 
     @Override

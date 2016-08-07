@@ -1,7 +1,12 @@
 package sissel.vm.execute;
 
+import com.sun.javafx.image.ByteToBytePixelConverter;
+import com.sun.tools.javac.code.Attribute;
 import sissel.classinfo.ClassBinary;
+import sissel.classinfo.FieldRef;
+import sissel.util.ByteTool;
 import sissel.vm.EInstruction;
+import sissel.vm.HeapDump;
 import sissel.vm.MyStackFrame;
 import sissel.vm.ObjectInstance;
 
@@ -36,5 +41,24 @@ public class ObjectHandler
         stackFrame.pushStack(arrayRef.lengthOfArray());
 
         return 1;
+    }
+
+    public static int getPutStatic(HeapDump heap, ClassBinary cl, MyStackFrame stackFrame, EInstruction instruction, byte[] byteCodes, int pc)
+    {
+        int index = ByteTool.uBigEnd(byteCodes[pc + 1], byteCodes[pc + 2]);
+        FieldRef fieldRef = cl.extractField(index);
+
+        ClassBinary targetClass = heap.getClassBinary(fieldRef.className);
+        if (instruction == EInstruction.getstatic)
+        {
+            stackFrame.pushStack(targetClass.getStatic(fieldRef.fieldName));
+        }
+        else
+        {
+            Object value = stackFrame.popStack();
+            targetClass.putStatic(fieldRef.fieldName, value);
+        }
+
+        return 3;
     }
 }

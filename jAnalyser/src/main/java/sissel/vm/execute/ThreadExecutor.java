@@ -4,9 +4,9 @@ import sissel.classinfo.ClassBinary;
 import sissel.classinfo.MethodInfo;
 import sissel.util.ByteTool;
 import sissel.vm.EInstruction;
+import sissel.vm.HeapDump;
 import sissel.vm.MyStackFrame;
 import sissel.vm.ThreadCopy;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * scope: 每个线程的执行
@@ -15,20 +15,20 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class ThreadExecutor
 {
     private ThreadCopy thread;
-    private int pc;
+    private HeapDump heap;
 
     public ThreadExecutor(ThreadCopy thread)
     {
         this.thread = thread;
+        this.heap = thread.heap;
     }
 
     public void start()
     {
-        pc = 0;
-        continues();
+        runCurrentMethod();
     }
 
-    public void continues()
+    public void runCurrentMethod()
     {
         thread.state = ThreadCopy.ThreadState.RUN;
 
@@ -38,6 +38,7 @@ public class ThreadExecutor
 
         int codeLength = methodInfo.code_length;
         byte[] byteCodes = methodInfo.code;
+        int pc = 0;
         while (pc < codeLength)
         {
             EInstruction instruction = EInstruction.forr(byteCodes[pc]);
@@ -156,6 +157,9 @@ public class ThreadExecutor
                     case ifnonnull:
                         pc = JumpHandler.aBranch(stackFrame, instruction, byteCodes, pc);
                         break;
+                    case getstatic:
+                    case putstatic:
+                        pc += ObjectHandler.getPutStatic(heap, classBinary, stackFrame, instruction, byteCodes, pc);
                 }
             }
         }

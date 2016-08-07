@@ -1,9 +1,11 @@
 package sissel.classinfo;
 
+import com.sun.jdi.ReferenceType;
 import sissel.util.ByteTool;
-import sissel.util.File2ByteArray;
+import sissel.util.ByteArrayTool;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -23,7 +25,17 @@ public class ClassBinary implements IClass
     int constant_pool_count;
 
     String this_class;
+    public String getThis_class()
+    {
+        return this_class;
+    }
+
     String super_class;
+    public String getSuper_class()
+    {
+        return super_class;
+    }
+
     int interfaces_count;
     String[] interfaces;
 
@@ -35,6 +47,8 @@ public class ClassBinary implements IClass
 
     int attributes_count;
     AttributeInfo[] attributes;
+
+    public boolean initialized = false;
 
     private int analyzeConstPool()
     {
@@ -64,8 +78,6 @@ public class ClassBinary implements IClass
             {
                 ++index;
             }
-
-            System.out.println(item.name());
         }
 
         return offset;
@@ -88,7 +100,7 @@ public class ClassBinary implements IClass
         interfaces = new String[interfaces_count];
         for (int i = 0; i < interfaces_count; i++)
         {
-            int index = ByteTool.uBigEnd(bytes[interfacesOffset + i + 2], bytes[interfacesOffset + i + 3]);
+            int index = ByteTool.uBigEnd(bytes[interfacesOffset + (i << 1) + 2], bytes[interfacesOffset + (i << 1) + 3]);
             interfaces[i] = extractStrFromClassInfo(index);
         }
     }
@@ -188,11 +200,21 @@ public class ClassBinary implements IClass
 
     public String extractStrFromClassInfo(int cl_index)
     {
-        int offset = cp_index[cl_index];
-        assert bytes[offset] == 7;
-        int utf8_index = ByteTool.uBigEnd(bytes[offset + 1], bytes[offset + 2]);
+        if (cl_index == 0)
+        {
+            return null;
+        }
 
-        return extractString(utf8_index);
+        try{
+            int offset = cp_index[cl_index];
+            assert bytes[offset] == 7;
+            int utf8_index = ByteTool.uBigEnd(bytes[offset + 1], bytes[offset + 2]);
+            return extractString(utf8_index);
+        }catch (ArrayIndexOutOfBoundsException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public String extractString(int index)
@@ -238,8 +260,42 @@ public class ClassBinary implements IClass
         return ByteTool.doubleFrom(bytes, cp_index[index] + 1);
     }
 
+    /**
+     *
+     * @return name=result[0], type=result[1]
+     */
+    public String[] extractNameType(int index)
+    {
+        int offset = cp_index[index];
+
+        assert bytes[index] == 12;
+        String name = extractString(ByteTool.uBigEnd(bytes[offset + 1], bytes[offset + 2]));
+        String type = extractString(ByteTool.uBigEnd(bytes[offset + 3], bytes[offset + 4]));
+
+        return new String[]{name, type};
+    }
+
+    public FieldRef extractField(int index)
+    {
+        int offset = cp_index[index];
+
+        assert bytes[offset] == 9; // Fieldref
+        int classIndex = ByteTool.uBigEnd(bytes[offset + 1], bytes[offset + 2]);
+        int nameTypeIndex = ByteTool.uBigEnd(bytes[offset + 3], bytes[offset + 4]);
+
+        String className = extractStrFromClassInfo(classIndex);
+        String[] nameType = extractNameType(nameTypeIndex);
+
+        return new FieldRef(className, nameType[1], nameType[0]);
+    }
+
     public Object getItem(int index)
     {
+        if (index == 0)
+        {
+            return null;
+        }
+
         switch (bytes[cp_index[index]])
         {
             case 1: // utf8_info
@@ -272,8 +328,20 @@ public class ClassBinary implements IClass
 
     public ClassBinary(String filePath) throws IOException
     {
-        this.bytes = File2ByteArray.read(filePath);
+        this.bytes = ByteArrayTool.fromFile(filePath);
         this.analyze();
+    }
+
+    public ClassBinary(InputStream in) throws  IOException
+    {
+        this.bytes = ByteArrayTool.fromStream(in);
+        this.analyze();
+    }
+
+    public void initialize()
+    {
+        initialized = true;
+        // TODO: 2016/8/7 call clinit
     }
 
     public static void main(String[] args)
@@ -288,5 +356,32 @@ public class ClassBinary implements IClass
         {
             e.printStackTrace();
         }
+    }
+
+    public Object getStatic(String name)
+    {
+        for (FieldInfo field : fields)
+        {
+            if (field.name.equals(name))
+            {
+                return field.value;
+            }
+        }
+
+        throw new NoSuchFieldError();
+    }
+
+    public void putStatic(String name, Object value)
+    {
+        for (FieldInfo field : fields)
+        {
+            if (field.name.equals(name))
+            {
+                field.value = value;
+                return;
+            }
+        }
+
+        throw new NoSuchFieldError();
     }
 }

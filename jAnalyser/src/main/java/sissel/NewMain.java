@@ -32,19 +32,13 @@ public class NewMain
         String mainClass = "sissel.HelloWorld";
         String options = "-cp G:\\Repository\\JAnalyser\\jAnalyser\\target\\classes";
         List<String> filterClassses = new LinkedList<>();
-        //filterClassses.add("sissel.HelloWorld");
-        filterClassses.add("sissel.test_cases.Add");
+        filterClassses.add("sissel.HelloWorld");
 
         Map<String, List<Integer>> bpMap = new HashMap<>();
         // breakpoint-main
-        //LinkedList<Integer> bp = new LinkedList<>();
-        //bp.add(43);
-        //bpMap.put("sissel.HelloWorld", bp);
-        // breakpoint-Add
-        LinkedList<Integer> bp_add = new LinkedList<>();
-        bp_add.add(16);
-        bpMap.put("sissel.test_cases.Add", bp_add);
-
+        LinkedList<Integer> bp = new LinkedList<>();
+        bp.add(32);
+        bpMap.put("sissel.HelloWorld", bp);
 
         VirtualMachineManager vmManager = Bootstrap.virtualMachineManager();
         LaunchingConnector connector = vmManager.defaultConnector();

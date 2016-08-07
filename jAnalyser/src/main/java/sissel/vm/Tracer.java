@@ -6,8 +6,12 @@ import com.sun.jdi.request.BreakpointRequest;
 import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequest;
 import com.sun.jdi.request.EventRequestManager;
+import com.sun.org.apache.bcel.internal.util.ClassLoader;
+import sissel.classinfo.ClassBinary;
 import sissel.util.DisplayString;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -183,7 +187,6 @@ public class Tracer extends Thread
 
             System.out.println("===== heap dump =====");
             HeapDump heapDump = HeapDump.newInstance(virtualMachine);
-            System.out.println(heapDump.toString());
             heapDump.initialize();
             System.out.println("initialization over");
 

@@ -13,12 +13,14 @@ public class ThreadCopy
     private Stack<MyStackFrame> stackFrames;
     private ThreadExecutor executor;
     public ThreadState state;
+    public HeapDump heap;
 
-    public ThreadCopy()
+    public ThreadCopy(HeapDump heapDump)
     {
         state = ThreadState.PREPARE;
         executor = new ThreadExecutor(this);
         stackFrames = new Stack<>();
+        heap = heapDump;
     }
 
     public MyStackFrame currentStackFrame()

@@ -2,6 +2,7 @@ package sissel.util;
 
 import sissel.classinfo.ClassBinary;
 import sissel.test_cases.Add;
+import sissel.vm.HeapDump;
 import sissel.vm.MyStackFrame;
 import sissel.vm.ThreadCopy;
 
@@ -21,7 +22,10 @@ public class TestTool
             ClassBinary clbin = new ClassBinary(path);
             MyStackFrame stackFrame = new MyStackFrame(clbin.getMethodInfo(methodName, descriptor));
 
-            ThreadCopy threadCopy = new ThreadCopy();
+            HeapDump heapDump = HeapDump.newInstance();
+            heapDump.addClassBinary(clbin);
+
+            ThreadCopy threadCopy = new ThreadCopy(heapDump);
             threadCopy.pushStackFrame(stackFrame);
             threadCopy.start();
         }
