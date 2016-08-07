@@ -121,19 +121,19 @@ public class ThreadExecutor
             {
                 pc = JumpHandler.go(instruction, byteCodes, pc);
             }
-            else if (byteCode == 0xa8 || byteCode == 0xc9)
+            else if (byteCode == 0xa8 || byteCode == 0xc9) // jsr
             {
                 pc += JumpHandler.jsr(stackFrame, instruction, byteCodes, pc);
             }
-            else if (byteCode == 0xa9)
+            else if (byteCode == 0xa9) // ret
             {
                 pc = JumpHandler.ret(stackFrame, instruction, byteCodes, pc);
             }
-            else if (byteCode == 0xaa)
+            else if (byteCode == 0xaa) // table switch
             {
                 pc = JumpHandler.tableSwitch(stackFrame, instruction, byteCodes, pc);
             }
-            else if (byteCode == 0xab)
+            else if (byteCode == 0xab) // lookup switch
             {
                 pc = JumpHandler.lookupSwitch(stackFrame, instruction, byteCodes, pc);
             }
@@ -144,7 +144,7 @@ public class ThreadExecutor
             }
             else if (byteCode >= 0xbb && byteCode <= 0xbd) // new
             {
-                pc += ObjectHandler.newObject(classBinary, stackFrame, instruction, byteCodes, pc);
+                pc += ObjectHandler.newObject(heap, thread, classBinary, stackFrame, instruction, byteCodes, pc);
             }
             else
             {
@@ -159,7 +159,10 @@ public class ThreadExecutor
                         break;
                     case getstatic:
                     case putstatic:
-                        pc += ObjectHandler.getPutStatic(heap, thread, classBinary, stackFrame, instruction, byteCodes, pc);
+                    case getfield:
+                    case putfield:
+                        pc += ObjectHandler.getPutSF(heap, thread, classBinary, stackFrame, instruction, byteCodes, pc);
+                        break;
                 }
             }
         }

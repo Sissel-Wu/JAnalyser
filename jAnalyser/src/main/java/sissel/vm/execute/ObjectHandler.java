@@ -13,12 +13,18 @@ import sissel.vm.*;
  */
 public class ObjectHandler
 {
-    public static int newObject(ClassBinary classBinary, MyStackFrame stackFrame, EInstruction instruction, byte[] byteCodes, int pc)
+    public static int newObject(HeapDump heap, ThreadCopy thread, ClassBinary classBinary, MyStackFrame stackFrame, EInstruction instruction, byte[] byteCodes, int pc)
     {
         switch (instruction)
         {
             case nnew:
-                break;
+                int classIndex = ByteTool.uBigEnd(byteCodes[pc + 1], byteCodes[pc + 2]);
+                String className = classBinary.extractStrFromClassInfo(classIndex);
+                ClassBinary clb = heap.getClassBinary(className);
+                clb.initialize(thread); // 初始化
+                ObjectInstance ref = new ObjectInstance(classBinary);
+                stackFrame.pushStack(ref);
+                return 3;
             case newarray:
                 int count = (Integer)stackFrame.popStack();
                 byte aType = byteCodes[pc + 1];
@@ -28,6 +34,7 @@ public class ObjectHandler
             case anewarray:
                 break;
         }
+
         throw new IndexOutOfBoundsException();
     }
 
@@ -40,22 +47,34 @@ public class ObjectHandler
         return 1;
     }
 
-    public static int getPutStatic(HeapDump heap, ThreadCopy thread, ClassBinary cl, MyStackFrame stackFrame, EInstruction instruction, byte[] byteCodes, int pc)
+    public static int getPutSF(HeapDump heap, ThreadCopy thread, ClassBinary cl, MyStackFrame stackFrame, EInstruction instruction, byte[] byteCodes, int pc)
     {
         int index = ByteTool.uBigEnd(byteCodes[pc + 1], byteCodes[pc + 2]);
         FieldRef fieldRef = cl.extractField(index);
-
         ClassBinary targetClass = heap.getClassBinary(fieldRef.className);
-        // 初始化
-        targetClass.initialize(thread);
-        if (instruction == EInstruction.getstatic)
+
+        switch (instruction)
         {
-            stackFrame.pushStack(targetClass.getStatic(fieldRef.fieldName));
-        }
-        else
-        {
-            Object value = stackFrame.popStack();
-            targetClass.putStatic(fieldRef.fieldName, value);
+            case getstatic:
+                targetClass.initialize(thread); // 初始化
+                stackFrame.pushStack(targetClass.getStatic(fieldRef.fieldName));
+                break;
+            case putstatic:
+                targetClass.initialize(thread); // 初始化
+                Object staticValue = stackFrame.popStack();
+                targetClass.putStatic(fieldRef.fieldName, staticValue);
+                break;
+            case getfield:
+                ObjectInstance objRef = (ObjectInstance)stackFrame.popStack();
+                objRef.getField(fieldRef);
+                break;
+            case putfield:
+                Object fieldValue = stackFrame.popStack();
+                ObjectInstance objRef2 = (ObjectInstance)stackFrame.popStack();
+                objRef2.putField(fieldRef, fieldValue);
+                break;
+            default:
+                throw new IndexOutOfBoundsException();
         }
 
         return 3;

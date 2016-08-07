@@ -44,7 +44,7 @@ public class ClassBinary implements IClass
     String[] interfaces;
 
     int fields_count;
-    FieldInfo[] fields;
+    public FieldInfo[] fields;
 
     int methods_count;
     MethodInfo[] methods;

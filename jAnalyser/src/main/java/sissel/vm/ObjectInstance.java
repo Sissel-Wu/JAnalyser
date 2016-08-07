@@ -2,10 +2,11 @@ package sissel.vm;
 
 import com.sun.jdi.*;
 import sissel.classinfo.ClassBinary;
+import sissel.classinfo.FieldInfo;
+import sissel.classinfo.FieldRef;
+import sissel.util.FieldDefault;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * 表示一个对象的实例
@@ -38,6 +39,27 @@ public class ObjectInstance
     {
         fieldMap = new HashMap<>();
 
+        // 从父类到子类放入field
+        recurPutFiled(classBinary);
+    }
+
+    // 递归从父类到子类放入field
+    private void recurPutFiled(ClassBinary classBinary)
+    {
+        String superClass = classBinary.getSuper_class();
+        if (superClass != null && (!superClass.equals("java/lang/Object")))
+        {
+            recurPutFiled(HeapDump.getInstance().getClassBinary(superClass));
+        }
+
+        FieldInfo[] fields = classBinary.fields;
+        for (FieldInfo fieldInfo : fields)
+        {
+            if (!fieldInfo.isStatic())
+            {
+                fieldMap.put(fieldInfo.name, FieldDefault.fromDescriptor(fieldInfo.descriptor));
+            }
+        }
     }
 
     /**
@@ -115,4 +137,39 @@ public class ObjectInstance
     {
         return array.length;
     }
+
+    public Object getField(FieldRef fieldRef)
+    {
+        return getField(fieldRef.fieldName);
+    }
+
+    public Object getField(String fieldName)
+    {
+        Object result = fieldMap.get(fieldName);
+
+        if (result == null)
+        {
+            throw new NoSuchElementException();
+        }
+        else
+        {
+            return result;
+        }
+    }
+
+    public void putField(String fieldName, Object value)
+    {
+        if (!fieldMap.containsKey(fieldName))
+        {
+            throw new NoSuchElementException();
+        }
+
+        fieldMap.put(fieldName, value);
+    }
+
+    public void putField(FieldRef fieldRef, Object value)
+    {
+        putField(fieldRef.fieldName, value);
+    }
+
 }
