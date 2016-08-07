@@ -68,8 +68,13 @@ public class HeapDump
             if (!(aClass instanceof ArrayType))
             {
                 ClassBinary classBinary = LoadClassHelper.load(aClass);
-                if (classBinary != null){
+                if (classBinary != null)
+                {
                     classMap.put(aClass.name(), classBinary);
+                }
+                else
+                {
+                    System.err.println("load fail: " + aClass.name());
                 }
             }
         }
@@ -89,17 +94,14 @@ public class HeapDump
         // 初始化需要初始化的ClassBinary
         for (ReferenceType aClass : allClasses)
         {
-            if (aClass.isInitialized())
+            if ((!(aClass instanceof ArrayType)) && aClass.isInitialized())
             {
                 ClassBinary classBinary = classMap.get(aClass.name());
-                if (aClass.isInitialized())
-                {
-                    classBinary.initialized = true;
-                    List<Field> fields = aClass.fields();
-                    fields.stream().filter(Field::isStatic).forEach(
-                            field -> classBinary.putStatic(field.name(), value2Obj(aClass.getValue(field)))
-                    );
-                }
+                classBinary.initialized = true;
+                List<Field> fields = aClass.fields();
+                fields.stream().filter(Field::isStatic).forEach(
+                        field -> classBinary.putStatic(field.name(), value2Obj(aClass.getValue(field)))
+                );
             }
         }
     }

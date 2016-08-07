@@ -1,8 +1,12 @@
 package sissel.classinfo;
 
 import com.sun.jdi.ReferenceType;
+import com.sun.tools.javac.code.Attribute;
 import sissel.util.ByteTool;
 import sissel.util.ByteArrayTool;
+import sissel.vm.HeapDump;
+import sissel.vm.MyStackFrame;
+import sissel.vm.ThreadCopy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +53,7 @@ public class ClassBinary implements IClass
     AttributeInfo[] attributes;
 
     public boolean initialized = false;
+    public boolean prepared = false;
 
     private int analyzeConstPool()
     {
@@ -268,7 +273,7 @@ public class ClassBinary implements IClass
     {
         int offset = cp_index[index];
 
-        assert bytes[index] == 12;
+        assert bytes[offset] == 12;
         String name = extractString(ByteTool.uBigEnd(bytes[offset + 1], bytes[offset + 2]));
         String type = extractString(ByteTool.uBigEnd(bytes[offset + 3], bytes[offset + 4]));
 
@@ -326,22 +331,57 @@ public class ClassBinary implements IClass
         throw new NoSuchMethodError();
     }
 
+    private void prepare()
+    {
+        prepared = true;
+        for (FieldInfo field : fields)
+        {
+            if (field.isStatic())
+            {
+                field.initializeDefault();
+            }
+        }
+    }
+
     public ClassBinary(String filePath) throws IOException
     {
         this.bytes = ByteArrayTool.fromFile(filePath);
         this.analyze();
+        this.prepare();
     }
 
     public ClassBinary(InputStream in) throws  IOException
     {
         this.bytes = ByteArrayTool.fromStream(in);
         this.analyze();
+        this.prepare();
     }
 
-    public void initialize()
+    public void initialize(ThreadCopy thread)
     {
+        if (initialized)
+        {
+            return;
+        }
+
+        // 初始化父类
+        if (! super_class.equals("java/lang/Object"))
+        {
+            HeapDump heap = HeapDump.getInstance();
+            ClassBinary father = heap.getClassBinary(super_class);
+            father.initialize(thread);
+        }
+
         initialized = true;
-        // TODO: 2016/8/7 call clinit
+        // call <clinit>
+        for (MethodInfo method : methods)
+        {
+            if (method.name.equals("<clinit>"))
+            {
+                MyStackFrame stackFrame = new MyStackFrame(method);
+                thread.callNewMethod(stackFrame); // no return value
+            }
+        }
     }
 
     public static void main(String[] args)

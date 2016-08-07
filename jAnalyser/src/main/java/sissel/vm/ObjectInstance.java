@@ -1,7 +1,9 @@
 package sissel.vm;
 
 import com.sun.jdi.*;
+import sissel.classinfo.ClassBinary;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,6 +28,16 @@ public class ObjectInstance
     public ObjectInstance(ObjectReference reference)
     {
         this.reference = reference;
+    }
+
+    /**
+     * 从自己的new的解释中
+     * @param classBinary 对应的 Class
+     */
+    public ObjectInstance(ClassBinary classBinary)
+    {
+        fieldMap = new HashMap<>();
+
     }
 
     /**
@@ -73,7 +85,7 @@ public class ObjectInstance
     }
 
     /**
-     * 初始化域信息
+     * 初始化域信息, 仅是从vm来的对象需要调用
      */
     public void initialize()
     {

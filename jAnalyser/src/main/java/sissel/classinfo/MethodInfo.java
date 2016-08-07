@@ -76,4 +76,39 @@ public class MethodInfo extends FMInfo
         }
         return null;
     }
+
+    public boolean isSynchronized()
+    {
+        return (access_flags & 0x0020) != 0;
+    }
+
+    public boolean isBridge()
+    {
+        return (access_flags & 0x0040) != 0;
+    }
+
+    public boolean isVaragrs()
+    {
+        return (access_flags & 0x0080) != 0;
+    }
+
+    public boolean isNative()
+    {
+        return (access_flags & 0x0100) != 0;
+    }
+
+    public boolean isAbstract()
+    {
+        return (access_flags & 0x0400) != 0;
+    }
+
+    public boolean isStrict()
+    {
+        return (access_flags & 0x0800) != 0;
+    }
+
+    public boolean isSynthetic()
+    {
+        return (access_flags & 0x1000) != 0;
+    }
 }

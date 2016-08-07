@@ -5,10 +5,7 @@ import com.sun.tools.javac.code.Attribute;
 import sissel.classinfo.ClassBinary;
 import sissel.classinfo.FieldRef;
 import sissel.util.ByteTool;
-import sissel.vm.EInstruction;
-import sissel.vm.HeapDump;
-import sissel.vm.MyStackFrame;
-import sissel.vm.ObjectInstance;
+import sissel.vm.*;
 
 /**
  * 对象的创建等指令
@@ -43,12 +40,14 @@ public class ObjectHandler
         return 1;
     }
 
-    public static int getPutStatic(HeapDump heap, ClassBinary cl, MyStackFrame stackFrame, EInstruction instruction, byte[] byteCodes, int pc)
+    public static int getPutStatic(HeapDump heap, ThreadCopy thread, ClassBinary cl, MyStackFrame stackFrame, EInstruction instruction, byte[] byteCodes, int pc)
     {
         int index = ByteTool.uBigEnd(byteCodes[pc + 1], byteCodes[pc + 2]);
         FieldRef fieldRef = cl.extractField(index);
 
         ClassBinary targetClass = heap.getClassBinary(fieldRef.className);
+        // 初始化
+        targetClass.initialize(thread);
         if (instruction == EInstruction.getstatic)
         {
             stackFrame.pushStack(targetClass.getStatic(fieldRef.fieldName));

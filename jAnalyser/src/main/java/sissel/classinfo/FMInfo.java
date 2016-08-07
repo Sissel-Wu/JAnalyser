@@ -34,4 +34,29 @@ public abstract class FMInfo
         }
         return sum;
     }
+
+    public boolean isPublic()
+    {
+        return (access_flags & 0x0001) != 0;
+    }
+
+    public boolean isPrivate()
+    {
+        return (access_flags & 0x0002) != 0;
+    }
+
+    public boolean isProtected()
+    {
+        return (access_flags & 0x0004) != 0;
+    }
+
+    public boolean isStatic()
+    {
+        return (access_flags & 0x0008) != 0;
+    }
+
+    public boolean isFinal()
+    {
+        return (access_flags & 0x0010) != 0;
+    }
 }

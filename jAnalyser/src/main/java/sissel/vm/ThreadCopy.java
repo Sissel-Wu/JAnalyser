@@ -17,10 +17,10 @@ public class ThreadCopy
 
     public ThreadCopy(HeapDump heapDump)
     {
+        heap = heapDump;
         state = ThreadState.PREPARE;
         executor = new ThreadExecutor(this);
         stackFrames = new Stack<>();
-        heap = heapDump;
     }
 
     public MyStackFrame currentStackFrame()
@@ -41,6 +41,15 @@ public class ThreadCopy
     public void start()
     {
         executor.start();
+    }
+
+    public Object callNewMethod(MyStackFrame stackFrame)
+    {
+        stackFrames.push(stackFrame);
+        Object result = executor.runCurrentMethod();
+        stackFrames.pop();
+
+        return result;
     }
 
     public enum ThreadState

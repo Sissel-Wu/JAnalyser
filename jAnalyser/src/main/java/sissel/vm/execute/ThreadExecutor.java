@@ -28,7 +28,7 @@ public class ThreadExecutor
         runCurrentMethod();
     }
 
-    public void runCurrentMethod()
+    public Object runCurrentMethod()
     {
         thread.state = ThreadCopy.ThreadState.RUN;
 
@@ -159,9 +159,11 @@ public class ThreadExecutor
                         break;
                     case getstatic:
                     case putstatic:
-                        pc += ObjectHandler.getPutStatic(heap, classBinary, stackFrame, instruction, byteCodes, pc);
+                        pc += ObjectHandler.getPutStatic(heap, thread, classBinary, stackFrame, instruction, byteCodes, pc);
                 }
             }
         }
+
+        return null;
     }
 }
