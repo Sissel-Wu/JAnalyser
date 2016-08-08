@@ -25,13 +25,13 @@ public class ThreadExecutor
 
     public void start()
     {
+        thread.state = ThreadCopy.ThreadState.RUN;
+
         runCurrentMethod();
     }
 
     public Object runCurrentMethod()
     {
-        thread.state = ThreadCopy.ThreadState.RUN;
-
         MyStackFrame stackFrame = thread.currentStackFrame();
         MethodInfo methodInfo = stackFrame.getMethodInfo();
         ClassBinary classBinary = stackFrame.getMethodInfo().classBinary;
@@ -137,10 +137,15 @@ public class ThreadExecutor
             {
                 pc = JumpHandler.lookupSwitch(stackFrame, instruction, byteCodes, pc);
             }
-            else if (byteCode >= 0xac && byteCode <= 0xb1) // xreturn
+            else if (byteCode >= 0xac && byteCode <= 0xb0) // xreturn
             {
-                // TODO: 2016/8/2 return
-                pc += 1;
+                thread.popStackFrame();
+                return stackFrame.popStack();
+            }
+            else if (byteCode == 0xb1) // return (void)
+            {
+                thread.popStackFrame();
+                return null;
             }
             else if (byteCode >= 0xb2 && byteCode <= 0xb5) // get put (static/field)
             {
