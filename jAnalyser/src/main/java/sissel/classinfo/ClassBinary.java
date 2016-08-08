@@ -1,9 +1,8 @@
 package sissel.classinfo;
 
-import com.sun.jdi.ReferenceType;
-import com.sun.tools.javac.code.Attribute;
-import sissel.util.ByteTool;
+import javafx.util.Pair;
 import sissel.util.ByteArrayTool;
+import sissel.util.ByteTool;
 import sissel.vm.HeapDump;
 import sissel.vm.MyStackFrame;
 import sissel.vm.ThreadCopy;
@@ -11,6 +10,8 @@ import sissel.vm.ThreadCopy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 解析二进制Class文件
@@ -54,6 +55,7 @@ public class ClassBinary implements IClass
 
     public boolean initialized = false;
     public boolean prepared = false;
+    private Map<Pair<String, String>, MethodInfo> methodMap; // key is <methodName, descriptor>, value is methodInfo
 
     private int analyzeConstPool()
     {
@@ -294,6 +296,21 @@ public class ClassBinary implements IClass
         return new FieldRef(className, nameType[1], nameType[0]);
     }
 
+    // TODO: 2016/8/8  与extractField 冗余
+    public MethodRef extractMethod(int index)
+    {
+        int offset = cp_index[index];
+
+        assert bytes[offset] == 10; // Methodref
+        int classIndex = ByteTool.uBigEnd(bytes[offset + 1], bytes[offset + 2]);
+        int nameTypeIndex = ByteTool.uBigEnd(bytes[offset + 3], bytes[offset + 4]);
+
+        String className = extractStrFromClassInfo(classIndex);
+        String[] nameType = extractNameType(nameTypeIndex);
+
+        return new MethodRef(className, nameType[1], nameType[0]);
+    }
+
     public Object getItem(int index)
     {
         if (index == 0)
@@ -320,15 +337,17 @@ public class ClassBinary implements IClass
 
     public MethodInfo getMethodInfo(String name, String descriptor)
     {
-        for (MethodInfo method : methods)
-        {
-            if (method.name.equals(name) && method.descriptor.equals(descriptor))
-            {
-                return method;
-            }
-        }
+        Pair<String, String> pair = new Pair<>(name, descriptor);
+        MethodInfo result = methodMap.get(pair);
 
-        throw new NoSuchMethodError();
+        if (result != null)
+        {
+            return result;
+        }
+        else
+        {
+            throw new NoSuchMethodError();
+        }
     }
 
     private void prepare()
@@ -348,6 +367,7 @@ public class ClassBinary implements IClass
         this.bytes = ByteArrayTool.fromFile(filePath);
         this.analyze();
         this.prepare();
+        this.fillInMethodMap();
     }
 
     public ClassBinary(InputStream in) throws  IOException
@@ -355,6 +375,7 @@ public class ClassBinary implements IClass
         this.bytes = ByteArrayTool.fromStream(in);
         this.analyze();
         this.prepare();
+        // fillInMethodMap would be called later by HeapDump.initialize()
     }
 
     public void initialize(ThreadCopy thread)
@@ -424,4 +445,40 @@ public class ClassBinary implements IClass
 
         throw new NoSuchFieldError();
     }
+
+    public void fillInMethodMap()
+    {
+        if (methodMap != null) // 防止多次填充
+        {
+            return;
+        }
+
+        methodMap = new HashMap<>();
+
+        if (super_class != null) // not java.lang.Object
+        {
+            ClassBinary superClass = HeapDump.getInstance().getClassBinary(super_class);
+            superClass.fillInMethodMap(); // 确保已经填充
+            // put every method in superClass to this
+            methodMap.putAll(superClass.methodMap);
+        }
+
+        // cover method with same name and descriptor
+        for (MethodInfo method : methods)
+        {
+            Pair<String, String> pair = new Pair<>(method.name, method.descriptor);
+            //TODO for test delete later
+            if (methodMap.get(pair) != null)
+            {
+                System.out.println("override " + this_class + " : " + method.name);
+            }
+            methodMap.put(pair, method);
+        }
+    }
+
+
+
+
+
+
 }

@@ -4,7 +4,7 @@ import com.sun.jdi.*;
 import sissel.classinfo.ClassBinary;
 import sissel.classinfo.FieldInfo;
 import sissel.classinfo.FieldRef;
-import sissel.util.FieldDefault;
+import sissel.util.DescriptorHelper;
 
 import java.util.*;
 
@@ -21,6 +21,9 @@ public class ObjectInstance
     ObjectReference reference;
     // 若是自己创建的数组类型，映射到这里
     Object[] array;
+
+    // 对应的类型
+    private ClassBinary classBinary;
 
     /**
      * 从vm中的ObjectReference初始化
@@ -57,7 +60,7 @@ public class ObjectInstance
         {
             if (!fieldInfo.isStatic())
             {
-                fieldMap.put(fieldInfo.name, FieldDefault.fromDescriptor(fieldInfo.descriptor));
+                fieldMap.put(fieldInfo.name, DescriptorHelper.getDefault(fieldInfo.descriptor));
             }
         }
     }
@@ -172,4 +175,13 @@ public class ObjectInstance
         putField(fieldRef.fieldName, value);
     }
 
+    public ClassBinary getClassBinary()
+    {
+        return classBinary;
+    }
+
+    public void setClassBinary(ClassBinary classBinary)
+    {
+        this.classBinary = classBinary;
+    }
 }

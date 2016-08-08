@@ -1,6 +1,6 @@
 package sissel.classinfo;
 
-import sissel.util.FieldDefault;
+import sissel.util.DescriptorHelper;
 
 /**
  * 字段的信息
@@ -39,6 +39,8 @@ public class FieldInfo extends FMInfo
     // 初始化静态域成默认值
     public void initializeDefault()
     {
-        value = FieldDefault.fromDescriptor(descriptor);
+        value = DescriptorHelper.getDefault(descriptor);
     }
+
+
 }

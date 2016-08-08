@@ -83,13 +83,6 @@ public class HeapDump
     public void initialize()
     {
         List<ReferenceType> allClasses = vm.allClasses();
-        // 初始化每个instance
-        for (ReferenceType aClass : allClasses)
-        {
-            Map<ObjectReference, ObjectInstance> objectInstances = objMap.get(aClass.name());
-
-            objectInstances.values().forEach(ObjectInstance::initialize);
-        }
 
         // 初始化需要初始化的ClassBinary
         for (ReferenceType aClass : allClasses)
@@ -102,7 +95,23 @@ public class HeapDump
                 fields.stream().filter(Field::isStatic).forEach(
                         field -> classBinary.putStatic(field.name(), value2Obj(aClass.getValue(field)))
                 );
+
+                classBinary.fillInMethodMap();
             }
+        }
+
+        // 初始化每个instance
+        for (ReferenceType aClass : allClasses)
+        {
+            ClassBinary classBinary = classMap.get(aClass.name());
+            Map<ObjectReference, ObjectInstance> objectInstances = objMap.get(aClass.name());
+
+            objectInstances.values().forEach(o ->
+                    {
+                        o.initialize();
+                        o.setClassBinary(classBinary);
+                    }
+            );
         }
     }
 

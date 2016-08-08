@@ -142,6 +142,14 @@ public class ThreadExecutor
                 // TODO: 2016/8/2 return
                 pc += 1;
             }
+            else if (byteCode >= 0xb2 && byteCode <= 0xb5) // get put (static/field)
+            {
+                pc += ObjectHandler.getPutSF(heap, thread, classBinary, stackFrame, instruction, byteCodes, pc);
+            }
+            else if (byteCode >= 0xb6 && byteCode <= 0xba)
+            {
+                pc += InvokeHandler.invoke(heap, thread, classBinary, stackFrame, instruction, byteCodes, pc);
+            }
             else if (byteCode >= 0xbb && byteCode <= 0xbd) // new
             {
                 pc += ObjectHandler.newObject(heap, thread, classBinary, stackFrame, instruction, byteCodes, pc);
@@ -156,12 +164,6 @@ public class ThreadExecutor
                     case ifnull:
                     case ifnonnull:
                         pc = JumpHandler.aBranch(stackFrame, instruction, byteCodes, pc);
-                        break;
-                    case getstatic:
-                    case putstatic:
-                    case getfield:
-                    case putfield:
-                        pc += ObjectHandler.getPutSF(heap, thread, classBinary, stackFrame, instruction, byteCodes, pc);
                         break;
                 }
             }

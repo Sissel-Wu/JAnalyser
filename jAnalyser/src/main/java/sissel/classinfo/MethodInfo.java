@@ -2,6 +2,8 @@ package sissel.classinfo;
 
 import sissel.util.ByteTool;
 
+import java.util.List;
+
 /**
  * 方法的信息
  * Created by Sissel on 2016/7/26.
@@ -17,6 +19,9 @@ public class MethodInfo extends FMInfo
 
     public int method_attr_count;
     public AttributeInfo[] method_attr;
+
+    private List<String> params;
+    private String returnType;
 
     private void analyzeAttributes(byte[] codeAttrInfo, int attributesOffset)
     {
