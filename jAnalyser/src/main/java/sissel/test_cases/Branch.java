@@ -50,13 +50,22 @@ public class Branch
     
     public int abranch()
     {
-        // TODO: 2016/8/6  
-        throw new NotImplementedException();
+        Simple s1 = new Simple();
+        Simple s2 = new Simple();
+
+        if (s1 != null && s1 != s2)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     public int tableSwitch()
     {
-        int a = 2;
+        int a = 3;
         a--;
         switch (a)
         {
@@ -65,6 +74,23 @@ public class Branch
             case 2:
                 return 2;
             case 3:
+                return 3;
+            default:
+                return -1;
+        }
+    }
+
+    public int lookupSwitch()
+    {
+        int a = 3;
+        a--;
+        switch (a)
+        {
+            case -221:
+                return 1;
+            case 2:
+                return 2;
+            case 39908:
                 return 3;
             default:
                 return -1;

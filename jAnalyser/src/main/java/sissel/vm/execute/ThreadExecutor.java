@@ -111,11 +111,11 @@ public class ThreadExecutor
             }
             else if (byteCode >= 0x99 && byteCode <= 0xa4) // if, if_icmp
             {
-                pc = JumpHandler.iBranch(stackFrame, instruction, byteCodes, pc);
+                pc += JumpHandler.iBranch(stackFrame, instruction, byteCodes, pc);
             }
             else if (byteCode >= 0xa5 && byteCode <= 0xa6) // if_acmp
             {
-                pc = JumpHandler.aBranch(stackFrame, instruction, byteCodes, pc);
+                pc += JumpHandler.aBranch(stackFrame, instruction, byteCodes, pc);
             }
             else if (byteCode == 0xa7 || byteCode == 0xc8) // goto
             {
@@ -131,11 +131,11 @@ public class ThreadExecutor
             }
             else if (byteCode == 0xaa) // table switch
             {
-                pc = JumpHandler.tableSwitch(stackFrame, instruction, byteCodes, pc);
+                pc += JumpHandler.tableSwitch(stackFrame, instruction, byteCodes, pc);
             }
             else if (byteCode == 0xab) // lookup switch
             {
-                pc = JumpHandler.lookupSwitch(stackFrame, instruction, byteCodes, pc);
+                pc += JumpHandler.lookupSwitch(stackFrame, instruction, byteCodes, pc);
             }
             else if (byteCode >= 0xac && byteCode <= 0xb0) // xreturn
             {
@@ -166,7 +166,7 @@ public class ThreadExecutor
                         break;
                     case ifnull:
                     case ifnonnull:
-                        pc = JumpHandler.aBranch(stackFrame, instruction, byteCodes, pc);
+                        pc += JumpHandler.aBranch(stackFrame, instruction, byteCodes, pc);
                         break;
                 }
             }

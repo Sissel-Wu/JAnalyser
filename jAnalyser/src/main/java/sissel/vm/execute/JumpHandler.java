@@ -56,7 +56,7 @@ public class JumpHandler
         }
         else
         {
-            return pc + 1;
+            return 3;
         }
     }
 
@@ -74,7 +74,7 @@ public class JumpHandler
                 }
                 else
                 {
-                    return pc + 1;
+                    return 3;
                 }
             case ifnonnull:
             case ifnull:
@@ -85,7 +85,7 @@ public class JumpHandler
                 }
                 else
                 {
-                    return pc + 1;
+                    return 3;
                 }
         }
 

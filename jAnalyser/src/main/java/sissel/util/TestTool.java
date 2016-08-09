@@ -14,24 +14,16 @@ import java.io.IOException;
  */
 public class TestTool
 {
-    public static void test(String className, String methodName, String descriptor)
+    public static Object test(String className, String methodName, String descriptor) throws IOException
     {
         String path = Add.class.getResource(className + ".class").getPath();
-        try
-        {
-            HeapDump heapDump = HeapDump.newInstance();
-            ClassBinary clbin = new ClassBinary(path);
-            MyStackFrame stackFrame = new MyStackFrame(clbin.getMethodInfo(methodName, descriptor));
+        HeapDump heapDump = HeapDump.newInstance();
+        ClassBinary clbin = new ClassBinary(path);
+        MyStackFrame stackFrame = new MyStackFrame(clbin.getMethodInfo(methodName, descriptor));
 
-            heapDump.addClassBinary(clbin);
+        heapDump.addClassBinary(clbin);
 
-            ThreadCopy threadCopy = new ThreadCopy(heapDump);
-            threadCopy.pushStackFrame(stackFrame);
-            threadCopy.start();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        ThreadCopy threadCopy = new ThreadCopy(heapDump);
+        return threadCopy.callNewMethod(stackFrame);
     }
 }
