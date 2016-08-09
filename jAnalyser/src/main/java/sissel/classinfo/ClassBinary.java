@@ -403,6 +403,8 @@ public class ClassBinary implements IClass
                 thread.callNewMethod(stackFrame); // no return value
             }
         }
+
+        this.fillInMethodMap();
     }
 
     public static void main(String[] args)

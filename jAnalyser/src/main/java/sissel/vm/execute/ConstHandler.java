@@ -370,8 +370,10 @@ public class ConstHandler
                 stackFrame.pushStack(top);
                 stackFrame.pushStack(nonTop);
                 break;
+            default:
+                throw new IndexOutOfBoundsException();
         }
 
-        throw new IndexOutOfBoundsException();
+        return 1;
     }
 }

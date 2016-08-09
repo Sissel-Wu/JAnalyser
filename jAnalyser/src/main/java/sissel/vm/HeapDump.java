@@ -90,12 +90,13 @@ public class HeapDump
             if ((!(aClass instanceof ArrayType)) && aClass.isInitialized())
             {
                 ClassBinary classBinary = classMap.get(aClass.name());
+                // 初始化
                 classBinary.initialized = true;
                 List<Field> fields = aClass.fields();
                 fields.stream().filter(Field::isStatic).forEach(
                         field -> classBinary.putStatic(field.name(), value2Obj(aClass.getValue(field)))
                 );
-
+                // 方法表
                 classBinary.fillInMethodMap();
             }
         }

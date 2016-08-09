@@ -17,4 +17,16 @@ public class ObjectOpTest
     {
         TestTool.test("ObjectOp", "newSimple", "()V");
     }
+
+    @Test
+    public void testNewComplex() throws Exception
+    {
+        TestTool.test("ObjectOp", "newComplex", "()V");
+    }
+
+    @Test
+    public void testNewSuperComplex() throws Exception
+    {
+        TestTool.test("ObjectOp", "newSuperComplex", "()V");
+    }
 }

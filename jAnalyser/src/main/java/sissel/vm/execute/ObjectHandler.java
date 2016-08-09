@@ -22,7 +22,8 @@ public class ObjectHandler
                 String className = classBinary.extractStrFromClassInfo(classIndex);
                 ClassBinary clb = heap.getClassBinary(className);
                 clb.initialize(thread); // 初始化
-                ObjectInstance ref = new ObjectInstance(classBinary);
+                ObjectInstance ref = new ObjectInstance(clb);
+                ref.setClassBinary(clb);
                 stackFrame.pushStack(ref);
                 return 3;
             case newarray:

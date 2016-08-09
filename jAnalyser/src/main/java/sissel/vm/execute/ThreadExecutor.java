@@ -139,12 +139,10 @@ public class ThreadExecutor
             }
             else if (byteCode >= 0xac && byteCode <= 0xb0) // xreturn
             {
-                thread.popStackFrame();
                 return stackFrame.popStack();
             }
             else if (byteCode == 0xb1) // return (void)
             {
-                thread.popStackFrame();
                 return null;
             }
             else if (byteCode >= 0xb2 && byteCode <= 0xb5) // get put (static/field)

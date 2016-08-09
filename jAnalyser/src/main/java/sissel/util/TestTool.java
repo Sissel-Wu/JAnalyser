@@ -19,10 +19,10 @@ public class TestTool
         String path = Add.class.getResource(className + ".class").getPath();
         try
         {
+            HeapDump heapDump = HeapDump.newInstance();
             ClassBinary clbin = new ClassBinary(path);
             MyStackFrame stackFrame = new MyStackFrame(clbin.getMethodInfo(methodName, descriptor));
 
-            HeapDump heapDump = HeapDump.newInstance();
             heapDump.addClassBinary(clbin);
 
             ThreadCopy threadCopy = new ThreadCopy(heapDump);
