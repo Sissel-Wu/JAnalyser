@@ -119,7 +119,7 @@ public class ThreadExecutor
             }
             else if (byteCode == 0xa7 || byteCode == 0xc8) // goto
             {
-                pc = JumpHandler.go(instruction, byteCodes, pc);
+                pc += JumpHandler.go(instruction, byteCodes, pc);
             }
             else if (byteCode == 0xa8 || byteCode == 0xc9) // jsr
             {

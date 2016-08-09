@@ -32,8 +32,9 @@ public class InvokeHandler
         }
 
         // 寻找具体的方法
-        MethodInfo calledMethod = null;
+        MethodInfo calledMethod;
         ClassBinary belongClass;
+        ObjectInstance objRef = null;
         switch (instruction)
         {
             case invokestatic:
@@ -43,11 +44,12 @@ public class InvokeHandler
                 break;
             case invokespecial:
                 belongClass = heap.getClassBinary(methodRef.className);
+                objRef = (ObjectInstance)stackFrame.popStack();
                 calledMethod = belongClass.getMethodInfo(methodRef.methodName, methodRef.descriptor);
                 break;
             case invokevirtual:
             case invokeinterface:
-                ObjectInstance objRef = (ObjectInstance)stackFrame.popStack();
+                objRef = (ObjectInstance)stackFrame.popStack();
                 calledMethod = objRef.getClassBinary().getMethodInfo(methodRef.methodName, methodRef.descriptor);
                 break;
             default:
@@ -57,7 +59,7 @@ public class InvokeHandler
         // this object
         if (instruction != EInstruction.invokestatic)
         {
-            tmpStack.push(stackFrame.popStack());
+            tmpStack.push(objRef);
         }
 
         // new stack frame
