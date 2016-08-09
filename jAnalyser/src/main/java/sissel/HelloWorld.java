@@ -1,7 +1,5 @@
 package sissel;
 
-import sissel.test_cases.Add;
-
 import java.io.Serializable;
 
 /**

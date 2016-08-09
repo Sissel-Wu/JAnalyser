@@ -1,13 +1,6 @@
 package sissel.test_cases;
 
-import sissel.classinfo.ClassBinary;
 import sissel.util.TestTool;
-import sissel.vm.MyStackFrame;
-import sissel.vm.ThreadCopy;
-
-import java.io.IOException;
-
-import static org.junit.Assert.*;
 
 /**
  * 测试Add的方法里面的指令的情况

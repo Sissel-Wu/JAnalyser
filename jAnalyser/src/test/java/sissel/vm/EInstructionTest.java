@@ -1,6 +1,6 @@
 package sissel.vm;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * 测试有无重复

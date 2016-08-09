@@ -37,6 +37,10 @@ public class InvokeHandler
         switch (instruction)
         {
             case invokestatic:
+                belongClass = heap.getClassBinary(methodRef.className);
+                belongClass.initialize(thread);
+                calledMethod = belongClass.getMethodInfo(methodRef.methodName, methodRef.descriptor);
+                break;
             case invokespecial:
                 belongClass = heap.getClassBinary(methodRef.className);
                 calledMethod = belongClass.getMethodInfo(methodRef.methodName, methodRef.descriptor);

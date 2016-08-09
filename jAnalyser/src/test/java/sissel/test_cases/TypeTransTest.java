@@ -3,8 +3,6 @@ package sissel.test_cases;
 import org.junit.Test;
 import sissel.util.TestTool;
 
-import static org.junit.Assert.*;
-
 /**
  * 类型转换指令的测试
  * Created by Sissel on 2016/8/5.

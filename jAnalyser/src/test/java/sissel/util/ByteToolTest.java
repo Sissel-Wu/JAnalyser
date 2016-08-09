@@ -1,6 +1,6 @@
 package sissel.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * 工具类的测试

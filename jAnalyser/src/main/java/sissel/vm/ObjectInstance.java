@@ -1,6 +1,8 @@
 package sissel.vm;
 
-import com.sun.jdi.*;
+import com.sun.jdi.Field;
+import com.sun.jdi.ObjectReference;
+import com.sun.jdi.Value;
 import sissel.classinfo.ClassBinary;
 import sissel.classinfo.FieldInfo;
 import sissel.classinfo.FieldRef;
@@ -22,8 +24,11 @@ public class ObjectInstance
     // 若是自己创建的数组类型，映射到这里
     Object[] array;
 
-    // 对应的类型
+    // 对应的类型, primitive和数组没有
     private ClassBinary classBinary;
+
+    // 数组有这个
+    private String componentType;
 
     /**
      * 从vm中的ObjectReference初始化
@@ -40,7 +45,8 @@ public class ObjectInstance
      */
     public ObjectInstance(ClassBinary classBinary)
     {
-        fieldMap = new HashMap<>();
+        this.classBinary = classBinary;
+        this.fieldMap = new HashMap<>();
 
         // 从父类到子类放入field
         recurPutFiled(classBinary);
@@ -65,6 +71,13 @@ public class ObjectInstance
         }
     }
 
+    public ObjectInstance(String componentType, int size)
+    {
+        this.componentType = componentType;
+
+        this.array = new Object[size];
+    }
+
     /**
      * 从自己的运行中初始化primitive数组
      * @param aType 原始类型
@@ -72,9 +85,6 @@ public class ObjectInstance
      */
     public ObjectInstance(byte aType, int size)
     {
-        this.reference = null;
-        this.fieldMap = null;
-
         if (size < 0)
         {
             throw new NegativeArraySizeException();
@@ -84,27 +94,35 @@ public class ObjectInstance
         {
             case 4:
                 array = new Boolean[size];
+                Arrays.fill(array, false);
                 break;
             case 5:
                 array = new Character[size];
+                Arrays.fill(array, '\u0000');
                 break;
             case 6:
                 array = new Float[size];
+                Arrays.fill(array, 0.0f);
                 break;
             case 7:
                 array = new Double[size];
+                Arrays.fill(array, 0.0);
                 break;
             case 8:
                 array = new Byte[size];
+                Arrays.fill(array, (byte)0);
                 break;
             case 9:
                 array = new Short[size];
+                Arrays.fill(array, (short)0);
                 break;
             case 10:
                 array = new Integer[size];
+                Arrays.fill(array, 0);
                 break;
             case 11:
                 array = new Long[size];
+                Arrays.fill(array, 0L);
                 break;
         }
     }
@@ -183,5 +201,10 @@ public class ObjectInstance
     public void setClassBinary(ClassBinary classBinary)
     {
         this.classBinary = classBinary;
+    }
+
+    public String getComponentType()
+    {
+        return componentType;
     }
 }

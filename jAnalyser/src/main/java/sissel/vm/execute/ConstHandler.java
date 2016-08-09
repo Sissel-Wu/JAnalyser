@@ -6,8 +6,6 @@ import sissel.vm.EInstruction;
 import sissel.vm.MyStackFrame;
 import sissel.vm.ObjectInstance;
 
-import java.util.DoubleSummaryStatistics;
-
 /**
  * 处理常量指令
  * Created by Sissel on 2016/7/31.

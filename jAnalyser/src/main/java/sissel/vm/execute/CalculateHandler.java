@@ -3,8 +3,6 @@ package sissel.vm.execute;
 import sissel.vm.EInstruction;
 import sissel.vm.MyStackFrame;
 
-import java.util.Objects;
-
 /**
  * 处理计算
  * Created by Sissel on 2016/8/2.

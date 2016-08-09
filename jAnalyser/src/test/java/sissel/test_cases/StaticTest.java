@@ -3,8 +3,6 @@ package sissel.test_cases;
 import org.junit.Test;
 import sissel.util.TestTool;
 
-import static org.junit.Assert.*;
-
 /**
  * getstatic putstatic
  * Created by Sissel on 2016/8/6.

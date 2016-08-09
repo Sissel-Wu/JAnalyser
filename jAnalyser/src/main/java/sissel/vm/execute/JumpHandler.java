@@ -3,7 +3,6 @@ package sissel.vm.execute;
 import sissel.util.ByteTool;
 import sissel.vm.EInstruction;
 import sissel.vm.MyStackFrame;
-import sissel.vm.ObjectInstance;
 
 /**
  * 跳转指令

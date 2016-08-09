@@ -2,8 +2,6 @@ package sissel.vm;
 
 import sissel.classinfo.MethodInfo;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 /**

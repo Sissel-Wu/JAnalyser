@@ -18,5 +18,17 @@ public class Array
         return result;
     }
 
+    public int newClassArray()
+    {
+        Simple[] simples = new Simple[4];
 
+        return simples.length;
+    }
+
+    public int multiDimensionArray()
+    {
+        int[][] arr = new int[10][19];
+
+        return arr[1][0];
+    }
 }

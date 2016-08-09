@@ -1,7 +1,5 @@
 package sissel.vm.execute;
 
-import com.sun.javafx.image.ByteToBytePixelConverter;
-import com.sun.tools.javac.code.Attribute;
 import sissel.classinfo.ClassBinary;
 import sissel.classinfo.FieldRef;
 import sissel.util.ByteTool;
@@ -15,25 +13,33 @@ public class ObjectHandler
 {
     public static int newObject(HeapDump heap, ThreadCopy thread, ClassBinary classBinary, MyStackFrame stackFrame, EInstruction instruction, byte[] byteCodes, int pc)
     {
+        int classIndex;
+        int count;
+        String className;
+        ObjectInstance ref;
         switch (instruction)
         {
             case nnew:
-                int classIndex = ByteTool.uBigEnd(byteCodes[pc + 1], byteCodes[pc + 2]);
-                String className = classBinary.extractStrFromClassInfo(classIndex);
+                classIndex = ByteTool.uBigEnd(byteCodes[pc + 1], byteCodes[pc + 2]);
+                className = classBinary.extractStrFromClassInfo(classIndex);
                 ClassBinary clb = heap.getClassBinary(className);
                 clb.initialize(thread); // 初始化
-                ObjectInstance ref = new ObjectInstance(clb);
-                ref.setClassBinary(clb);
+                ref = new ObjectInstance(clb);
                 stackFrame.pushStack(ref);
                 return 3;
             case newarray:
-                int count = (Integer)stackFrame.popStack();
+                count = (Integer)stackFrame.popStack();
                 byte aType = byteCodes[pc + 1];
-                ObjectInstance arrayRef = new ObjectInstance(aType, count);
-                stackFrame.pushStack(arrayRef);
+                ref = new ObjectInstance(aType, count);
+                stackFrame.pushStack(ref);
                 return 2;
             case anewarray:
-                break;
+                count = (Integer)stackFrame.popStack();
+                classIndex = ByteTool.uBigEnd(byteCodes[pc + 1], byteCodes[pc + 2]);
+                className = classBinary.extractStrFromClassInfo(classIndex);
+                ref = new ObjectInstance(className, count);
+                stackFrame.pushStack(ref);
+                return 3;
         }
 
         throw new IndexOutOfBoundsException();
